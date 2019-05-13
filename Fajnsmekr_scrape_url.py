@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import csv
+import re
 
 url = "https://www.fajnsmekr.cz/"
 search = "search_res.aspx?fulldata=brno"
@@ -12,7 +13,7 @@ rows = table.findChildren("a")
 #for row in rows: #sem potom bdue muset přijít všechno co se bdue dít na další otevřené stránce
 #    print(url + row['href'])
 name_rest = rows[0].text #poté bude v cyklu aby se název restaurace měnil
-url_rest = "restaurace/mju_z.aspx"
+url_rest = "restaurace/adria.aspx"
 res1 = requests.get(url + url_rest)
 soup_restaurant = BeautifulSoup(res1.text, "lxml")
 
@@ -25,6 +26,8 @@ for tag in description_rest.find_all('tr'): #celé informace o místě
     for column in columns:
         output_row.append(column.text.strip())
     output_rows.append(output_row)
+#Restaurace info -> zapisuje do csv, tady je asi vše ok
+"""
 values_header = []
 values_info = [name_rest]
 for row in output_rows[10:15]: # 10:15 protože v tomto intervalu jsou listy s informacemi, které chceme (vyzkoušela jsem na několika restauracích, vždy to je stejné(asi šablona))
@@ -37,9 +40,14 @@ with open("info_rest.csv","w",encoding="utf-8",newline='') as csvfile:
         clean_header.append(header.replace(":","")) #header values bez dvojtečky
     writer.writerow(clean_header)#zapsání header do csv, při zapisování všech restaurací b mělo být asi mimo celkový cyklus
     writer.writerow(values_info)#zapsaní hodnot informací o restauraci
+"""
+#Adresa restaurace
+rest_adress = output_rows[3][0].split("-")
+street_city = re.split("(\d\d\d\d\d .+)",rest_adress[0])
+print(street_city[0:2])
 
-
-#Reviews text
+#Reviews text -> Issue s komentáři komentářů !
+"""
 rest_reviews = soup_restaurant.find('table', {'class': 'mytxt'})
 reviews_to_file = [] #seznam pro zápis textu reviews do souboru
 for review in rest_reviews.find_all('font', {'class': 'zobrazhodn'}):# Filtruje jen texty! :D
@@ -52,3 +60,4 @@ for review_text in reviews_to_file:
     #review_text.replace("\n"," ")
     with open('reviews.txt', 'a', encoding='utf-8') as f:
         f.write(review_text + "\n\n") #zatím dvě mezery jen pro přehlednost, taky je to třeba předělat do csv, aby byla vždy na řádku jedna recenze + název restaurace, další problém je, že review obsahují i komentáře komentářu, třeba odstranit
+"""
