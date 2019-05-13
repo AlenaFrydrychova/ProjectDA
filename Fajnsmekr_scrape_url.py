@@ -30,7 +30,7 @@ values_info = [name_rest]
 for row in output_rows[10:15]: # 10:15 protože v tomto intervalu jsou listy s informacemi, které chceme (vyzkoušela jsem na několika restauracích, vždy to je stejné(asi šablona))
     values_header.append(row[0]) #header pro hodnoty (stačí mít u jednoho)
     values_info.append(row[1]) #do souboru to chci tak abych zapisovala jen hodnoty parametrů (má/nemá parkoviště)
-with open("info_rest.csv","w",encoding="utf-8") as csvfile:
+with open("info_rest.csv","w",encoding="utf-8",newline='') as csvfile:
     writer = csv.writer(csvfile)
     clean_header = ["Název restaurace"] #seznam pro očištění header values od dvojtečky
     for header in values_header:
