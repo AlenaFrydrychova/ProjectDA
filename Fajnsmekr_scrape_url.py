@@ -15,11 +15,30 @@ name_rest = rows_name[0].text #zatím jen název první restaurace
 
 #celkové hodnocení restauracemi #zatim sice tiske hodnoty jednotlivých buněk, ale nevím jak je sčítat po řádkách a jak zajistit aby když nic nenajde byla 0
 rest_rating = []
+poradi = 1 #pocita poradi radku, ale vynechava radky, ktere neobsahuji "td", {"class": "hbg1"}
+
 for line in table.find_all("td", {"class": "hbg1"}):
-    value_rating = 0
-    for rating in line.find_all("img"):    
-        value_rating += (int(rating.get('width')))
+    if line != 0:    
+        for rating in line.find_all("img"):
+            width = int(rating.get('width'))    
+            if width == 11:
+                value_rating += width
+                if width == 12:
+                    value_rating += width
+                    print(width)
+                    print(value_rating, poradi)
+                    value_rating = 0
+                    poradi += 1
+            elif width > 0 and width < 11:
+                value_rating += width
+                print(width)
+                print(value_rating, poradi)
+                value_rating = 0
+                poradi += 1
+    else:
+        value_rating = 0
         print(value_rating)
+  
 
  #poté bude v cyklu aby se název restaurace měnil
 """
