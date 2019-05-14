@@ -1,2 +1,2 @@
-Název restaurace,Počet míst,Parkoviště,Nekuřácká restaurace,Nekuřácký salonek,Bezbariérový přístup
-[mju:z],100,NE,ANO,NE,ANO
+Název restaurace,Ulice,Město,PSČ,Počet míst,Parkoviště,Nekuřácká restaurace,Nekuřácký salonek,Bezbariérový přístup
+[mju:z],Cimburkova  4,Brno,61200,0,ANO,NE,NE,NE
