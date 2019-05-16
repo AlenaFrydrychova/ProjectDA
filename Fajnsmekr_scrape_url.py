@@ -1,7 +1,9 @@
-import requests
+from lxml import html
 from bs4 import BeautifulSoup
+import requests
 import csv
 import re
+
 
 url = "https://www.fajnsmekr.cz/"
 search = "search_res.aspx?fulldata=brno"
@@ -12,13 +14,11 @@ rows_name = table.findChildren("a")
 name_rest = rows_name[0].text #zatím jen název první restaurace
 
 #for row in rows: #sem potom bdue muset přijít všechno co se bdue dít na další otevřené stránce
-
- #poté bude v cyklu aby se název restaurace měnil
-"""
-url_rest = "restaurace/al_capone_pub.aspx"
+#poté bude v cyklu aby se název restaurace měnil
+url_rest = "restaurace/mju_z.aspx"
 res1 = requests.get(url + url_rest)
 soup_restaurant = BeautifulSoup(res1.text, "lxml")
-
+"""
 #najde tabulku s classou popisrest a v ní vyhledá všechny tabulky a dá je do řádků (nevim jestli to vysvětluju správně), 10 až 15 řádek je info o restauraci, které chceme
 description_rest = soup_restaurant.find("table",  {"class": "popisrest"})
 output_rows = []
@@ -49,26 +49,33 @@ with open("info_rest.csv","w",encoding="utf-8",newline='') as csvfile:
     writer.writerow(clean_header)#zapsání header do csv, při zapisování všech restaurací b mělo být asi mimo celkový cyklus
     writer.writerow(values_info)#zapsaní hodnot informací o restauraci
 """
-"""
+#datum u reviews
+date_reviews = []
+for review_date in soup_restaurant.find_all('td', text = re.compile('\d\d\.\d\d\.\d\d\d\d')):
+    date_review = review_date.text.strip()
+    date_reviews.append(date_review)
 #Reviews text -> Issue s komentáři komentářů !
 rest_reviews = soup_restaurant.find('table', {'class': 'mytxt'})
 reviews_to_file = [] #seznam pro zápis textu reviews do souboru
 no_rating = str(soup_restaurant.find('td', {'colspan': '7'}).text).strip()
-print(no_rating)
+
 if no_rating == "Nehodnoceno":
     reviews_to_file.append("Nehodnoceno")
-    print(reviews_to_file)
 else:
-    for review in rest_reviews.find_all('font', {'class': 'zobrazhodn'}):# Filtruje jen texty! :D
-        to_remove = review.find_all("div") #odstranila jsem tím komentář komentářů, ale nějakým záhadným způsobem tam je ještě jednou, přitom v html ho vidím jen jednou :D Div protože je to jediný div v tagu font
-        for element in to_remove:
-            element.extract()
-        text_reviews = name_rest + "#" + review.text #zatím přidává jméno první restaurace, prootže nescrapujem všecky
-        reviews_to_file.append(text_reviews) #seznam pro zápis do souboru
+    byte_string = res1.content
+    source_code = html.fromstring(byte_string)
+    path = '//td/a/font[@class="zobrazhodn"][1]'
+    tree = source_code.xpath(path)
+    i = 0
+    for review in tree:
+        review = name_rest + "#" + date_reviews[i] + "#" + review.text_content().strip()
+        reviews_to_file.append(review) #seznam pro zápis do souboru
+        delete_comments = [re.sub(r'\n+Koment.+$', '', review) for review in reviews_to_file]
+        clean_reviews = [re.sub(r'\n+', '', review) for review in delete_comments]
+        i += 1
 
 #zápis reviews do csv, pořád zapisuje i komentáře komentářů :(
 with open('reviews.csv', 'w',encoding='utf-8', newline='') as csvfile:
     writer = csv.writer(csvfile)
-    for value in reviews_to_file:
+    for value in clean_reviews:
         writer.writerow([value])
-"""
