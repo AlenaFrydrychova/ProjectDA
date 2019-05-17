@@ -13,12 +13,20 @@ table = soup.find("table", {"class": "mytxt"}) #tabulka s restauracemi
 rows_name = table.findChildren("a")
 name_rest = rows_name[0].text #zatím jen název první restaurace
 
-#for row in rows: #sem potom bdue muset přijít všechno co se bdue dít na další otevřené stránce
+links = []
+for link in table.find_all('a', attrs={'href': re.compile("^restaurace.+\.aspx$")}):
+    links.append(link.get('href'))
+
+print(links)
+
+
+for link in links: #sem potom bdue muset přijít všechno co se bdue dít na další otevřené stránce
 #poté bude v cyklu aby se název restaurace měnil
-url_rest = "restaurace/mju_z.aspx"
-res1 = requests.get(url + url_rest)
-soup_restaurant = BeautifulSoup(res1.text, "lxml")
-"""
+    url_rest = link
+    res1 = requests.get(url + url_rest, timeout=10)
+    soup_restaurant = BeautifulSoup(res1.text, "lxml")
+
+
 #najde tabulku s classou popisrest a v ní vyhledá všechny tabulky a dá je do řádků (nevim jestli to vysvětluju správně), 10 až 15 řádek je info o restauraci, které chceme
 description_rest = soup_restaurant.find("table",  {"class": "popisrest"})
 output_rows = []
@@ -28,7 +36,7 @@ for tag in description_rest.find_all('tr'): #celé informace o místě
     for column in columns:
         output_row.append(column.text.strip())
     output_rows.append(output_row)
-"""
+
 """
 #Adresa restaurace
 rest_adress = output_rows[3][0].split("-")
