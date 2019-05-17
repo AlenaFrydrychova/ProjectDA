@@ -14,17 +14,15 @@ rows_name = table.findChildren("a")
 name_rest = rows_name[0].text #zatím jen název první restaurace
 
 links = []
-for link in table.find_all('a', attrs={'href': re.compile("^restaurace.+\.aspx$")}):
+for link in table.find_all('a', attrs={'href': re.compile("^restaurace.+\.aspx$")}): #najde odkazy restauraci
     links.append(link.get('href'))
 
 print(links)
 
 
-for link in links: #sem potom bdue muset přijít všechno co se bdue dít na další otevřené stránce
-#poté bude v cyklu aby se název restaurace měnil
-    url_rest = link
-    res1 = requests.get(url + url_rest, timeout=10)
-    soup_restaurant = BeautifulSoup(res1.text, "lxml")
+for link in links: 
+    urls = requests.get(url + link, timeout=10)
+    soup_restaurant = BeautifulSoup(urls.text, "lxml")
 
 
 #najde tabulku s classou popisrest a v ní vyhledá všechny tabulky a dá je do řádků (nevim jestli to vysvětluju správně), 10 až 15 řádek je info o restauraci, které chceme
