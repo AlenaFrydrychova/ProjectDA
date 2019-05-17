@@ -3,41 +3,35 @@ from bs4 import BeautifulSoup
 import requests
 import csv
 import re
+import time
 
-
+#VYTAHNE ZAKLADNI TABULKU VSECH RESTAURACI
 url = "https://www.fajnsmekr.cz/"
 search = "search_res.aspx?fulldata=brno"
-res = requests.get(url + search, timeout=10)
+res = requests.get(url + search)
 soup = BeautifulSoup(res.text, "lxml")
 table = soup.find("table", {"class": "mytxt"}) #tabulka s restauracemi
 rows_name = table.findChildren("a")
 
-
+#SEZNAM PRO ODKAZY NA RESTAURACE
 links = []
 for link in table.find_all('a', attrs={'href': re.compile("^restaurace.+\.aspx$")}): #najde odkazy restauraci
     links.append(link.get('href'))
 
+#LOOP KTERY POSTUPNE PROJDE VSECHNY RESTAURACE
 n = 0
 for link in links: 
-    restaurant_url = requests.get(url + link, timeout=10)
+    restaurant_url = requests.get(url + link, timeout=5)
     soup_restaurant = BeautifulSoup(restaurant_url.text, "lxml")
     description_rest = soup_restaurant.find("table",  {"class": "popisrest"})
     name_rest = rows_name[n].text
 
-#najde tabulku s classou popisrest a v ní vyhledá všechny tabulky a dá je do řádků (nevim jestli to vysvětluju správně), 10 až 15 řádek je info o restauraci, které chceme
-    output_rows = []
-    for tag in description_rest.find_all('tr'): #celé informace o místě
-        columns = tag.find_all('td')
-        output_row = []
-        for column in columns:
-            output_row.append(column.text.strip())
-        output_rows.append(output_row)
-
+   
     date_reviews = []
-    for review_date in soup_restaurant.find_all('td', text = re.compile('\d\d\.\d\d\.\d\d\d\d')):
+    for review_date in soup_restaurant.find_all('td', text = re.compile('\d\d\.\d\d\.\d\d\d\d')): #vyhleda data a zapise do seznamu date_reviews
         date_review = review_date.text.strip()
         date_reviews.append(date_review)
-    #Reviews text -> Issue s komentáři komentářů !
+    
     rest_reviews = soup_restaurant.find('table', {'class': 'mytxt'})
     reviews_to_file = [] #seznam pro zápis textu reviews do souboru
     no_rating = str(soup_restaurant.find('td', {'colspan': '7'}).text).strip()
@@ -53,21 +47,34 @@ for link in links:
         for review in tree:
             review = name_rest + "#" + date_reviews[i] + "#" + review.text_content().strip()
             reviews_to_file.append(review) #seznam pro zápis do souboru
-            delete_comments = [re.sub(r'\n+Koment.+$', '', review) for review in reviews_to_file]
+            delete_comments = [re.sub(r'[\n*]?Koment.*([\n*]?.*)*', '', review) for review in reviews_to_file] #najde vsechny komentare a smaze
             clean_reviews = [re.sub(r'\n+', '', review) for review in delete_comments]
-            print(clean_reviews)
+            
             i += 1
+
+              #zápis reviews do csv, pořád zapisuje i komentáře komentářů :(
+        with open('reviews.csv', 'a',encoding='utf-8', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            for value in clean_reviews:
+                writer.writerow([value])
+
     n += 1
 
-
-    #zápis reviews do csv, pořád zapisuje i komentáře komentářů :(
-with open('reviews.csv', 'w',encoding='utf-8', newline='') as csvfile:
-    writer = csv.writer(csvfile)
-    for value in clean_reviews:
-        writer.writerow([value])
+  
 
     
 """
+
+ #najde tabulku s classou popisrest a v ní vyhledá všechny tabulky a dá je do řádků (nevim jestli to vysvětluju správně), 10 až 15 řádek je info o restauraci, které chceme
+    #output_rows = []
+    #for tag in description_rest.find_all('tr'): #celé informace o místě
+     #   columns = tag.find_all('td')
+      #  output_row = []
+       # for column in columns:
+       #     output_row.append(column.text.strip())
+       # output_rows.append(output_row)
+
+
 #Adresa restaurace
 rest_adress = output_rows[3][0].split("-")
 street = re.split("(\d\d\d\d\d .+)",rest_adress[0])
@@ -87,5 +94,5 @@ with open("info_rest.csv","w",encoding="utf-8",newline='') as csvfile:
     writer.writerow(clean_header)#zapsání header do csv, při zapisování všech restaurací b mělo být asi mimo celkový cyklus
     writer.writerow(values_info)#zapsaní hodnot informací o restauraci
 """
-#datum u reviews
+
     
