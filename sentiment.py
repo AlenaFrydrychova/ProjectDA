@@ -7,11 +7,12 @@ import xlrd
 def get_sentiment(chunk):
     payload = {
         'text': chunk,
-        'user_key': 'f61bdd3e6f1024513115068d79c6009d'
+        'user_key': 'b0273bf8e53597cc65ddaab58d6ad530',
+        'domain': 'voc-hospitality'
     }
     r = requests.get('https://api.geneea.com/s2/sentiment', params=payload)
     return(r.json())
-    print(r.json())
+   
 
 
 #OTEVIRANI SOUBORU POMOCI KNIHOVNY XLRD, ROZDELENI OBSAHU PODLE RADKU
@@ -38,7 +39,13 @@ for recenze in reviews:
         except KeyError:
             hodnoty_tofile.append('error')
 
+#LIST PRO ZJISTENI MNOZSTVI POUZITYCH ZNAKU
+used_chars = []
+for element in reviews:
+    used_chars.append(len(element))
+
+
 
 with open('reviews_analysis.csv', 'w', encoding='utf-8') as csvfile:
     writer = csv.writer(csvfile)
-    writer.writerows(zip(reviews, hodnoty_tofile))
+    writer.writerows(zip(reviews, hodnoty_tofile, used_chars))
