@@ -2,7 +2,7 @@ import requests
 import csv
 import xlrd
 
-
+"""
 #FUKNCE NA ZJISTENI SENTIMENTU - POSLE REQUEST NA GENEEA.COM
 def get_sentiment(chunk):
     payload = {
@@ -12,7 +12,7 @@ def get_sentiment(chunk):
     }
     r = requests.get('https://api.geneea.com/s2/sentiment', params=payload)
     return(r.json())
-   
+
 
 
 #OTEVIRANI SOUBORU POMOCI KNIHOVNY XLRD, ROZDELENI OBSAHU PODLE RADKU
@@ -29,7 +29,7 @@ for i in range(sheet.nrows):
 reviews = []
 for i in rows[1:]:
     reviews.append(i[2])
-   
+
 
 #POUZIJE FUNKCI ANALYZUJ_RECENZI A HODNOTY ULOZI DO LISTU
 hodnoty_tofile = []
@@ -49,3 +49,21 @@ for element in reviews:
 with open('reviews_analysis.csv', 'w', encoding='utf-8') as csvfile:
     writer = csv.writer(csvfile)
     writer.writerows(zip(reviews, hodnoty_tofile, used_chars))
+"""
+#STOPWORDS
+prepositions = ["od","z","s","do","bez","krom","kromě","podle","okolo","vedle","během","prostřednictvím","u","za","k","před","na","oproti","naproti","proti","pro", "mimo", "pod","nad","mezi","skrz","o","po","v"]
+conjunctions = ["a", "i", "ani", "nebo", "či", "přímo", "nadto", "ani", "jak", "tak", "hned", "jednak", "zčásti", "dílem", "ale", "avšak", "však", "leč", "nýbrž", "naopak", "jenomže", "jenže", "sice", "jistě", "ale", "i", "ba", "ba i", "ba ani", "nadto", "dokonce", "nejen", "nebo", "anebo", "buď", "totiž", "vždyť", "neboť", "vždyť", "totiž", "však", "také", "proto", "a proto", "a tak", "tudíž", "a tudíž", "tedy"]
+pronouns = ["já", "ty", "on", "ona", "ono", "my", "vy", "oni", "ony", "ona","se", "můj", "tvůj", "jeho", "její", "náš", "váš", "svůj", "ten", "tento", "tenhle", "onen", "takový", "týž", "tentýž", "sám", "kdo", "co", "jaký", "který","čí", "jenž", "nikdo", "nic", "nijaký", "ničí", "žádný", "někdo", "nějaký", "některý", "lecco", "něčí", "něco"]
+verb_be = ["být","bejt","jsem","jsi","je","jest","jsme","jste","jsou","budu","budeš","bude","budeme","budete","budou","buď","budiž","buďme","buďmež","buďte","buďtež","byl","byla","bylo","byli","byly","jsa","jsouc","jsouce","byv","byvše","byvši","bych","bychom","bys","byste","by", "seš"]
+verb_have = ["mám","máš","má","máme","máte","mají","měj","mějme","mějte","měl","měla","mělo","měli","měly","maje","majíc","majíce"]
+
+diacritic = "ěščřžýáíéůúďťň"
+without_diacritic = "escrzyaieuudtn"
+prepositions_without = []
+for preposition in prepositions:
+    for i in preposition:
+        if i in preposition:
+            i.replace(diacritic,without_diacritic)
+        prep_without = preposition
+    prepositions_without.append(prep_without)
+print(prepositions_without)
