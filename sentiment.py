@@ -1,6 +1,7 @@
 import requests
 import csv
 import xlrd
+import unicodedata
 
 """
 #FUKNCE NA ZJISTENI SENTIMENTU - POSLE REQUEST NA GENEEA.COM
@@ -54,16 +55,27 @@ with open('reviews_analysis.csv', 'w', encoding='utf-8') as csvfile:
 prepositions = ["od","z","s","do","bez","krom","kromě","podle","okolo","vedle","během","prostřednictvím","u","za","k","před","na","oproti","naproti","proti","pro", "mimo", "pod","nad","mezi","skrz","o","po","v"]
 conjunctions = ["a", "i", "ani", "nebo", "či", "přímo", "nadto", "ani", "jak", "tak", "hned", "jednak", "zčásti", "dílem", "ale", "avšak", "však", "leč", "nýbrž", "naopak", "jenomže", "jenže", "sice", "jistě", "ale", "i", "ba", "ba i", "ba ani", "nadto", "dokonce", "nejen", "nebo", "anebo", "buď", "totiž", "vždyť", "neboť", "vždyť", "totiž", "však", "také", "proto", "a proto", "a tak", "tudíž", "a tudíž", "tedy"]
 pronouns = ["já", "ty", "on", "ona", "ono", "my", "vy", "oni", "ony", "ona","se", "můj", "tvůj", "jeho", "její", "náš", "váš", "svůj", "ten", "tento", "tenhle", "onen", "takový", "týž", "tentýž", "sám", "kdo", "co", "jaký", "který","čí", "jenž", "nikdo", "nic", "nijaký", "ničí", "žádný", "někdo", "nějaký", "některý", "lecco", "něčí", "něco"]
-verb_be = ["být","bejt","jsem","jsi","je","jest","jsme","jste","jsou","budu","budeš","bude","budeme","budete","budou","buď","budiž","buďme","buďmež","buďte","buďtež","byl","byla","bylo","byli","byly","jsa","jsouc","jsouce","byv","byvše","byvši","bych","bychom","bys","byste","by", "seš"]
-verb_have = ["mám","máš","má","máme","máte","mají","měj","mějme","mějte","měl","měla","mělo","měli","měly","maje","majíc","majíce"]
+verbs = ["být","bejt","jsem","jsi","je","jest","jsme","jste","jsou","budu","budeš","bude","budeme","budete","budou","buď","budiž","buďme","buďmež","buďte","buďtež","byl","byla","bylo","byli","byly","jsa","jsouc","jsouce","byv","byvše","byvši","bych","bychom","bys","byste","by", "seš", "mám","máš","má","máme","máte","mají","měj","mějme","mějte","měl","měla","mělo","měli","měly","maje","majíc","majíce"]
 
-diacritic = "ěščřžýáíéůúďťň"
-without_diacritic = "escrzyaieuudtn"
+
 prepositions_without = []
 for preposition in prepositions:
-    for i in preposition:
-        if i in preposition:
-            i.replace(diacritic,without_diacritic)
-        prep_without = preposition
-    prepositions_without.append(prep_without)
-print(prepositions_without)
+    preposition= ''.join((c for c in unicodedata.normalize('NFD', preposition) if unicodedata.category(c) != 'Mn'))
+    prepositions_without.append(preposition)
+
+pronouns_without = []
+for pronoun in pronouns:
+    pronoun = ''.join((c for c in unicodedata.normalize('NFD', pronoun) if unicodedata.category(c) != 'Mn'))
+    pronouns_without.append(pronoun)
+
+conjuctions_without = []
+for conjuction in conjunctions:
+    conjuction = ''.join((c for c in unicodedata.normalize('NFD', conjuction) if unicodedata.category(c) != 'Mn'))
+    prepositions_without.append(conjuction)
+
+verbs_without = []
+for verb in verbs:
+    verb = ''.join((c for c in unicodedata.normalize('NFD', verb) if unicodedata.category(c) != 'Mn'))
+    prepositions_without.append(verb)
+
+print(pronouns_without, prepositions_without, verbs_without)
