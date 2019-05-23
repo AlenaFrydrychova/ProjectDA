@@ -1,7 +1,7 @@
 import requests
 import csv
 import xlrd
-import unicodedata
+#import unicodedata
 
 """
 #FUKNCE NA ZJISTENI SENTIMENTU - POSLE REQUEST NA GENEEA.COM
@@ -16,7 +16,7 @@ def get_sentiment(chunk):
 """
 
 #OTEVIRANI SOUBORU POMOCI KNIHOVNY XLRD, ROZDELENI OBSAHU PODLE RADKU
-workbook = xlrd.open_workbook('C:\\DA\\ProjectDA\\Excel\\reviews.xlsx', 'rb')
+workbook = xlrd.open_workbook('C:\\Users\\Alena\\Documents\\DA Czechitas\\projekt\\ProjectDA\\Excel\\reviews.xlsx', 'rb')#('C:\\DA\\ProjectDA\\Excel\\reviews.xlsx', 'rb')
 sheet = workbook.sheet_by_index(0)
 rows = []
 for i in range(sheet.nrows):
@@ -30,7 +30,7 @@ reviews = []
 for i in rows[1:]:
     reviews.append(i[2])
 
-"""
+'''
 #POUZIJE FUNKCI ANALYZUJ_RECENZI A HODNOTY ULOZI DO LISTU
 hodnoty_tofile = []
 for recenze in reviews:
@@ -49,6 +49,52 @@ for element in reviews:
 with open('\\csv\\reviews_analysis.csv', 'w', encoding='utf-8') as csvfile:
     writer = csv.writer(csvfile)
     writer.writerows(zip(reviews, hodnoty_tofile, used_chars))
+
+
+'''
+#NAJDE 2 SLOVA PRED A ZA KLICOVYMI
+def get_extracts(reviews, key_word):
+    position = reviews_by_word.index(key_word)
+    while position > 0:
+        position = reviews_by_word.index(key_word, position+2)
+        extracts.append(reviews_by_word[position-2:position+3])
+    return extracts
+
+reviews_string = ''.join(reviews)
+reviews_by_word = reviews_string.split()
+extracts = []
+key_words = ['jídlo', 'obsluha', 'restaurace']
+
+
+for key_word in key_words:
+    try:
+        get_extracts(reviews, key_word)
+    except ValueError:
+        pass
+
+print(extracts)
+
+
+#IN PROGRESS
+DictOfWords = {}
+
+max_value = 0
+
+for extract in extracts:
+  if extract in DictOfWords:
+    DictOfWords[extract] += 1
+    if DictOfWords[extract] > max_value:
+        max_value = DictOfWords[extract]
+
+  else:
+    DictOfWords[extract] = 1
+
+for key, value in DictOfWords.items():
+    if value == max_value:
+        print(key)
+
+
+
 """
 #STOPWORDS WITH DIACRITICS LOWERCASE
 prepositions = ["od","z","s","do","bez","krom","kromě","podle","okolo","vedle","během","prostřednictvím","u","za","k","před","na","oproti","naproti","proti","pro", "mimo", "pod","nad","mezi","skrz","o","po","v"]
@@ -96,3 +142,4 @@ plt.axis("off")
 plt.show()
 
 wordcloud.to_file("img\\all_reviews.png")
+"""
