@@ -1,7 +1,9 @@
 import requests
 import csv
 import xlrd
-#import unicodedata
+import re
+import heapq
+import unicodedata
 
 """
 #FUKNCE NA ZJISTENI SENTIMENTU - POSLE REQUEST NA GENEEA.COM
@@ -52,50 +54,7 @@ with open('\\csv\\reviews_analysis.csv', 'w', encoding='utf-8') as csvfile:
 
 
 '''
-#NAJDE 2 SLOVA PRED A ZA KLICOVYMI
-def get_extracts(reviews, key_word):
-    position = reviews_by_word.index(key_word)
-    while position > 0:
-        position = reviews_by_word.index(key_word, position+2)
-        extracts.append(reviews_by_word[position-2:position+3])
-    return extracts
 
-reviews_string = ''.join(reviews)
-reviews_by_word = reviews_string.split()
-extracts = []
-key_words = ['jídlo', 'obsluha', 'restaurace']
-
-
-for key_word in key_words:
-    try:
-        get_extracts(reviews, key_word)
-    except ValueError:
-        pass
-
-print(extracts)
-
-
-#IN PROGRESS
-DictOfWords = {}
-
-max_value = 0
-
-for extract in extracts:
-  if extract in DictOfWords:
-    DictOfWords[extract] += 1
-    if DictOfWords[extract] > max_value:
-        max_value = DictOfWords[extract]
-
-  else:
-    DictOfWords[extract] = 1
-
-for key, value in DictOfWords.items():
-    if value == max_value:
-        print(key)
-
-
-
-"""
 #STOPWORDS WITH DIACRITICS LOWERCASE
 prepositions = ["od","z","s","do","bez","krom","kromě","podle","okolo","vedle","během","prostřednictvím","u","za","k","před","na","oproti","naproti","proti","pro", "mimo", "pod","nad","mezi","skrz","o","po","v"]
 conjunctions = ["a", "i", "ani", "nebo", "či", "přímo", "nadto", "ani", "jak", "tak", "hned", "jednak", "zčásti", "dílem", "ale", "avšak", "však", "leč", "nýbrž", "naopak", "jenomže", "jenže", "sice", "jistě", "ale", "i", "ba", "ba i", "ba ani", "nadto", "dokonce", "nejen", "nebo", "anebo", "buď", "totiž", "vždyť", "neboť", "vždyť", "totiž", "však", "také", "proto", "a proto", "a tak", "tudíž", "a tudíž", "tedy"]
@@ -123,6 +82,100 @@ verbs_upper_without = [verb.upper() for verb in verbs_without]
 
 stopwords = prepositions + conjunctions + pronouns + verbs + prepositions_without + pronouns_without + conjunctions_without + verbs_without + prepositions_upper + conjuctions_upper + pronouns_upper + verbs_upper + prepositions_upper_without + conjuctions_upper_without + pronouns_upper_without + verbs_upper_without + another_specific
 
+
+
+#NAJDE 2 SLOVA PRED A ZA KLICOVYMI
+def get_extracts(reviews, key_word):
+    position = reviews_by_word.index(key_word)
+    while position > 0:
+        position = reviews_by_word.index(key_word, position+2)
+        extracts.append(reviews_by_word[position-2:position+3])
+    return extracts
+
+reviews_string = ''.join(reviews)
+reviews_by_word = reviews_string.split()
+extracts = []
+key_words = ['jídlo', 'obsluha', 'restaurace']
+
+
+for key_word in key_words:
+    try:
+        get_extracts(reviews, key_word)
+    except ValueError:
+        pass
+
+
+extract_re = re.compile(r'^.*\.+.*$')
+for extract in extracts:
+    for i in extract:
+        if len(i) < 4:
+            extract.remove(i)
+        elif i.endswith('.') or i == extract_re:
+            extract.remove(i)
+
+
+#SKAREDY KOD PRO ROZDELENI UTRZKU PODLE TEMAT A ZJISTENI NEJCASTEJSICH SLOV
+list_jidlo = []
+Dict_jidlo = {}
+
+for extract in extracts:
+    if key_words[0] in extract:
+        list_jidlo.append(extract)
+
+for extract in list_jidlo:
+    for word in extract:
+        if word in Dict_jidlo:
+            Dict_jidlo[word] += 1
+        else:
+            Dict_jidlo[word] = 1
+
+Dict_jidlo = heapq.nlargest(50, Dict_jidlo, key=Dict_jidlo.get)
+print(Dict_jidlo)
+
+
+list_obsluha = []
+Dict_obsluha = {}
+
+for extract in extracts:
+    if key_words[1] in extract:
+        list_obsluha.append(extract)
+
+for extract in list_obsluha:
+    for word in extract:
+        if word in Dict_obsluha:
+            Dict_obsluha[word] += 1
+        else:
+            Dict_obsluha[word] = 1
+
+Dict_obsluha = heapq.nlargest(50, Dict_obsluha, key=Dict_obsluha.get)
+print(Dict_obsluha)
+
+list_restaurace = []
+Dict_restaurace = {}
+
+for extract in extracts:
+    if key_words[2] in extract:
+        list_restaurace.append(extract)
+
+for extract in list_restaurace:
+    for word in extract:
+        if word in Dict_restaurace:
+            Dict_restaurace[word] += 1
+        else:
+            Dict_restaurace[word] = 1
+
+Dict_restaurace = heapq.nlargest(50, Dict_restaurace, key=Dict_restaurace.get)
+print(Dict_restaurace)
+
+
+
+
+
+
+
+
+
+'''
 #WORDCLOUD
 import pandas as pd
 from PIL import Image
@@ -142,4 +195,4 @@ plt.axis("off")
 plt.show()
 
 wordcloud.to_file("img\\all_reviews.png")
-"""
+'''
