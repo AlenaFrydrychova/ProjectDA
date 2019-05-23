@@ -16,7 +16,7 @@ def get_sentiment(chunk):
 """
 
 #OTEVIRANI SOUBORU POMOCI KNIHOVNY XLRD, ROZDELENI OBSAHU PODLE RADKU
-workbook = xlrd.open_workbook('C:\\DA\\ProjectDA\\reviews.xlsx', 'rb')
+workbook = xlrd.open_workbook('C:\\DA\\ProjectDA\\Excel\\reviews.xlsx', 'rb')
 sheet = workbook.sheet_by_index(0)
 rows = []
 for i in range(sheet.nrows):
@@ -46,7 +46,7 @@ for element in reviews:
 
 
 
-with open('reviews_analysis.csv', 'w', encoding='utf-8') as csvfile:
+with open('\\csv\\reviews_analysis.csv', 'w', encoding='utf-8') as csvfile:
     writer = csv.writer(csvfile)
     writer.writerows(zip(reviews, hodnoty_tofile, used_chars))
 """
@@ -95,4 +95,4 @@ plt.imshow(wordcloud, interpolation='bilinear')
 plt.axis("off")
 plt.show()
 
-wordcloud.to_file("all_reviews.png")
+wordcloud.to_file("img\\all_reviews.png")

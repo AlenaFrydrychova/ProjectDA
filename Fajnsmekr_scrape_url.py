@@ -53,7 +53,7 @@ for link in links:
             i += 1
 
               #zápis reviews do csv
-        with open('reviews.csv', 'a',encoding='utf-8', newline='') as csvfile:
+        with open('csv\\reviews.csv', 'a',encoding='utf-8', newline='') as csvfile:
             writer = csv.writer(csvfile)
             for value in clean_reviews:
                 writer.writerow([value])
