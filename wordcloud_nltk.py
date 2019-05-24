@@ -71,10 +71,14 @@ import nltk
 from nltk.corpus import stopwords
 import nltk.tokenize
 from nltk.text import Text
+import sys
 
 #stop_words = str(stopwords_cz)
 
 string_reviews = "\n".join(reviews)
 t = nltk.tokenize.WhitespaceTokenizer() #tokenizer
 textList = Text(t.tokenize(string_reviews))
-textList.concordance("obsluha")
+sys.stdout = open('concordance.txt', 'w', encoding="utf-8")#zápis do souboru (přesměruje výsledek printu do souboru)
+obsluha = textList.concordance("obsluha", lines=100)
+sys.stdout = sys.__stdout__ #vrátí výsledky printu do příkazové řádky
+print("zpatky")
