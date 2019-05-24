@@ -72,7 +72,7 @@ from nltk.corpus import stopwords
 import nltk.tokenize
 from nltk.text import Text
 
-stop_words = str(stopwords_cz)
+#stop_words = str(stopwords_cz)
 
 string_reviews = "\n".join(reviews)
 t = nltk.tokenize.WhitespaceTokenizer() #tokenizer
