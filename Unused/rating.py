@@ -1,4 +1,4 @@
-#celkové hodnocení restaurací, vynechává nuly, což je trochu problém
+#celkové hodnocení restaurací, vynechává nuly, což je trochu problém :(
 rest_rating = []
 poradi = 1 #pocita poradi radku, ale vynechava radky, ktere neobsahuji "td", {"class": "hbg1"}
 
