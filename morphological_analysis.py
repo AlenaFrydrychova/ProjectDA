@@ -1,11 +1,8 @@
 import xlrd
-import pandas as pd
-from PIL import Image
-from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
-import matplotlib.pyplot as plt
+import requests
+import json
+import csv
 import unicodedata
-import random
-
 
 #OTEVIRANI SOUBORU POMOCI KNIHOVNY XLRD, ROZDELENI OBSAHU PODLE RADKU
 workbook = xlrd.open_workbook('C:\\DA\\ProjectDA\\Excel\\sentiment.xlsx', 'rb')
@@ -18,20 +15,6 @@ for i in range(sheet.nrows):
     for j in range(sheet.ncols):
         columns.append(sheet.cell(i, j).value)
     rows.append(columns)
-
-# VYTAHNE Z RADKU 2. HODNOTU - REVIEW A ROZDELÍ PODLE SENTIMENTU DO SEZNAMŮ
-reviews_all = []
-positive_reviews = []
-negative_reviews = []
-neutral_reviews = []
-for i in rows[1:]:
-    reviews_all.append(i[1])
-    if i[2] == 1:
-        positive_reviews.append(i[1])
-    elif i[2] == 0:
-        neutral_reviews.append(i[1])
-    elif i[2] == -1:
-        negative_reviews.append(i[1])
 
 #STOPWORDS WITH DIACRITICS LOWERCASE
 prepositions = ["od","z","s","do","bez","krom","kromě","podle","okolo","vedle","během","prostřednictvím","u","za","k","před","na","oproti","naproti","proti","pro", "mimo", "pod","nad","mezi","skrz","o","po","v"]
@@ -61,71 +44,40 @@ verbs_upper_without = [verb.upper() for verb in verbs_without]
 # ALL STOPWORDS
 stopwords_cz = prepositions + conjunctions + pronouns + verbs + prepositions_without + pronouns_without + conjunctions_without + verbs_without + prepositions_upper + conjuctions_upper + pronouns_upper + verbs_upper + prepositions_upper_without + conjuctions_upper_without + pronouns_upper_without + verbs_upper_without + another_specific
 
-#WORDCLOUD
-def wordcloud_color(word=None, font_size=None, position=None, orientation=None, font_path=None, random_state=None):
-    h = color
-    s = int(100.0 * 255.0 / 255.0)
-    l = int(100.0 * float(random_state.randint(60, 120)) / 255.0)
-    return "hsl({}, {}%, {}%)".format(h, s, l)
+# VYTAHNE Z RADKU 2. HODNOTU - REVIEW A ROZDELÍ PODLE SENTIMENTU DO SEZNAMŮ
+reviews_all = []
+positive_reviews = []
+negative_reviews = []
+neutral_reviews = []
+for i in rows[1:]:
+    reviews_all.append(i[1])
+    if i[2] == 1:
+        positive_reviews.append(i[1])
+    elif i[2] == 0:
+        neutral_reviews.append(i[1])
+    elif i[2] == -1:
+        negative_reviews.append(i[1])
 
-def wordcloud_to_file(list_of_text,file):
-    list_of_text = [review.strip() for review in list_of_text]
-    reviews_dict = {"review" : list_of_text}
-    df = pd.DataFrame(reviews_dict)
-    text = " ".join(review for review in df.review) #recenze
-    wordcloud = WordCloud(width=800, height=400,color_func=wordcloud_color, stopwords=stopwords_cz, max_words=120, background_color="white").generate(text)
-    # plt.figure(figsize=(15,10))
-    # plt.imshow(wordcloud, interpolation='bilinear')
-    # plt.axis("off")
-    # plt.show()
-    wordcloud.to_file("img\\" + file)
+#reguest na API na FI MU
+#pouze jedna recenze, nechtěla jsem si to hend rozbít :D
+text = reviews_all[0]
+url = "https://nlp.fi.muni.cz/languageservices/"
+morphological_analysis = "service.py?call=tagger&lang=cs&output=json&text=" + text
 
-color = 60
-wordcloud_to_file(reviews_all,"all_reviews.png")
+res = requests.get(url + morphological_analysis + text)
+cont = res.json()
+list_of_words = cont["vertical"]
 
-color = 140
-wordcloud_to_file(positive_reviews,"positive_reviews.png")
+#přidá lemmata slov, která nejsou ve stopslovech do listu, juhů
+lemmata = []
+for list in list_of_words:
+    try:
+        if list[1] not in stopwords_cz and len(list[1]) > 2:
+            lemmata.append(list[1])
+    except:
+        IndexError
 
-color = 21
-wordcloud_to_file(negative_reviews,"negative_reviews.png")
-
-"""
-#KNIHOVNA NLTK
-import nltk
-from nltk.tokenize import word_tokenize
-from nltk.text import Text
-from nltk.probability import FreqDist
-from nltk.stem import WordNetLemmatizer
-import sys
-
-def get_concordance(list_of_reviews,concordance_word,count_of_lines,file):
-    string_reviews = "\n".join(list_of_reviews)
-    tokens = nltk.tokenize.word_tokenize(string_reviews)
-    tokens = [token for token in tokens if not token in stopwords_cz]
-    clean_reviews = " ".join(tokens)
-    #Zobrazení shody ukazuje každý výskyt daného slova spolu s určitým kontextem
-    t = nltk.WhitespaceTokenizer()
-    textList = Text(t.tokenize(string_reviews))
-    #zápis do souboru (přesměruje výsledek printu do souboru)
-    sys.stdout = open("txt\\" + file, 'a', encoding="utf-8")
-    textList.concordance(concordance_word, lines=count_of_lines)
-    #vrátí výsledky printu do příkazové řádky
-    sys.stdout = sys.__stdout__
-
-get_concordance(positive_reviews,"obsluha",1167,"concordance_positive.txt")
-get_concordance(negative_reviews,"obsluha",136,"concordance_negative.txt")
-get_concordance(reviews_all,"obsluha",1935,"concordance_all.txt")
-"""
-"""
-#lexikální bohatost textu neboli počet odlišných slov v textu (v procentech)
-richness = (len(set(textList)) / len(textList))*100
-print(round(richness,2), "%")
-"""
-#FREKVENCE SLOV (potřeba lemmatizovat alespoň některá a zapsat je do nějaké tabulky, ideální by bylo udělat zvlášť frekvenci slov pro pozitivní a negativní recenze, stejně tak wordcloud, který je momentálně ze všech recenzí)
-fdist = FreqDist()
-for word in word_tokenize(clean_positive_reviews):
-    fdist[word.lower()] += 1
-words = fdist.most_common(15)
-
-df_positive = pd.DataFrame(words ,columns=["word","count"])
-print(df_positive)
+with open("lemmata.csv","a",encoding="utf-8", newline="") as f:
+    writer = csv.writer(f)
+    for lemma in lemmata:
+        writer.writerow([lemma])
