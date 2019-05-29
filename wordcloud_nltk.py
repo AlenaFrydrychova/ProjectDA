@@ -4,6 +4,7 @@ from PIL import Image
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 import matplotlib.pyplot as plt
 import unicodedata
+import random
 
 
 #OTEVIRANI SOUBORU POMOCI KNIHOVNY XLRD, ROZDELENI OBSAHU PODLE RADKU
@@ -58,80 +59,66 @@ pronouns_upper_without = [pronoun.upper() for pronoun in pronouns_without]
 verbs_upper_without = [verb.upper() for verb in verbs_without]
 
 stopwords_cz = prepositions + conjunctions + pronouns + verbs + prepositions_without + pronouns_without + conjunctions_without + verbs_without + prepositions_upper + conjuctions_upper + pronouns_upper + verbs_upper + prepositions_upper_without + conjuctions_upper_without + pronouns_upper_without + verbs_upper_without + another_specific
+
+#WORDCLOUD
+def wordcloud_color(word=None, font_size=None, position=None, orientation=None, font_path=None, random_state=None):
+    h = color
+    s = int(100.0 * 255.0 / 255.0)
+    l = int(100.0 * float(random_state.randint(60, 120)) / 255.0)
+    return "hsl({}, {}%, {}%)".format(h, s, l)
+
+def wordcloud_to_file(list_of_text,file):
+    list_of_text = [review.strip() for review in list_of_text]
+    reviews_dict = {"review" : list_of_text}
+    df = pd.DataFrame(reviews_dict)
+    text = " ".join(review for review in df.review) #recenze
+    wordcloud = WordCloud(width=800, height=400,color_func=wordcloud_color, stopwords=stopwords_cz, max_words=120, background_color="white").generate(text)
+    # plt.figure(figsize=(15,10))
+    # plt.imshow(wordcloud, interpolation='bilinear')
+    # plt.axis("off")
+    # plt.show()
+    wordcloud.to_file("img\\" + file)
+
+color = 60
+wordcloud_to_file(reviews_all,"all_reviews.png")
+
+color = 140
+wordcloud_to_file(positive_reviews,"positive_reviews.png")
+
+color = 21
+wordcloud_to_file(negative_reviews,"negative_reviews.png")
+
 """
-#WORDCLOUD ALL REVIEWS
-reviews_all = [review.strip() for review in reviews_all]
-reviews_dict = {"review" : reviews_all} #z listu slovník, aby měl sloupec header (určitě jde i jinak)
-df = pd.DataFrame(reviews_dict) #pandas dataframe ze slovníku reviews
-text = " ".join(review for review in df.review) #recenze
-
-wordcloud = WordCloud(width=800, height=400, stopwords=stopwords_cz, max_words=120, background_color="white").generate(text)
-
-plt.figure(figsize=(15,10))
-plt.imshow(wordcloud, interpolation='bilinear')
-plt.axis("off")
-plt.show()
-
-wordcloud.to_file("img\\all_reviews.png")
-"""
-"""
-#WORDCLOUD NEGATIVE REVIEWS
-negative_reviews = [review.strip() for review in negative_reviews]
-negative_reviews_dict = {"review" : negative_reviews} #z listu slovník, aby měl sloupec header (určitě jde i jinak)
-df = pd.DataFrame(negative_reviews_dict) #pandas dataframe ze slovníku reviews
-text = " ".join(review for review in df.review) #recenze
-
-wordcloud = WordCloud(width=800, height=400, stopwords=stopwords_cz, max_words=120, background_color="white").generate(text)
-
-plt.figure(figsize=(15,10))
-plt.imshow(wordcloud, interpolation='bilinear')
-plt.axis("off")
-plt.show()
-
-wordcloud.to_file("img\\negative_reviews.png")
-"""
-"""
-#WORDCLOUD POSITIVE REVIEWS
-positive_reviews = [review.strip() for review in positive_reviews]
-positive_reviews_dict = {"review" : positive_reviews} #z listu slovník, aby měl sloupec header (určitě jde i jinak)
-df = pd.DataFrame(positive_reviews_dict) #pandas dataframe ze slovníku reviews
-text = " ".join(review for review in df.review) #recenze
-
-wordcloud = WordCloud(width=800, height=400, stopwords=stopwords_cz, max_words=120, background_color="white").generate(text)
-
-plt.figure(figsize=(15,10))
-plt.imshow(wordcloud, interpolation='bilinear')
-plt.axis("off")
-plt.show()
-
-wordcloud.to_file("img\\positive_reviews.png")
-"""
-
 #KNIHOVNA NLTK
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.text import Text
 from nltk.probability import FreqDist
+from nltk.stem import WordNetLemmatizer
 import sys
 
-stopwords = stopwords_cz
-string_positive_reviews = "\n".join(positive_reviews)
+def get_concordance(list_of_reviews,concordance_word,count_of_lines,file):
+    string_reviews = "\n".join(list_of_reviews)
+    tokens = nltk.tokenize.word_tokenize(string_reviews)
+    tokens = [token for token in tokens if not token in stopwords_cz]
+    clean_reviews = " ".join(tokens)
+    #Zobrazení shody ukazuje každý výskyt daného slova spolu s určitým kontextem
+    t = nltk.WhitespaceTokenizer()
+    textList = Text(t.tokenize(string_reviews))
+    #zápis do souboru (přesměruje výsledek printu do souboru)
+    sys.stdout = open(file, 'a', encoding="utf-8")
+    textList.concordance(concordance_word, lines=count_of_lines)
+    #vrátí výsledky printu do příkazové řádky
+    sys.stdout = sys.__stdout__
 
-tokens_positive = nltk.tokenize.word_tokenize(string_positive_reviews)
-tokens_positive = [token for token in tokens_positive if not token in stopwords]
-clean_positive_reviews = " ".join(tokens_positive)
-
-#Zobrazení shody ukazuje každý výskyt daného slova spolu s určitým kontextem
-t = nltk.WhitespaceTokenizer()
-textList = Text(t.tokenize(string_positive_reviews))
-#sys.stdout = open('concordance.txt', 'w', encoding="utf-8")#zápis do souboru (přesměruje výsledek printu do souboru)
-textList.concordance("obsluha", lines=10)
-#sys.stdout = sys.__stdout__ #vrátí výsledky printu do příkazové řádky
-
+get_concordance(positive_reviews,"obsluha",1167,"concordance_positive.txt")
+get_concordance(negative_reviews,"obsluha",136,"concordance_negative.txt")
+get_concordance(reviews_all,"obsluha",1935,"concordance_all.txt")
+"""
+"""
 #lexikální bohatost textu neboli počet odlišných slov v textu (v procentech)
 richness = (len(set(textList)) / len(textList))*100
 print(round(richness,2), "%")
-
 #FREKVENCE SLOV (potřeba lemmatizovat alespoň některá a zapsat je do nějaké tabulky, ideální by bylo udělat zvlášť frekvenci slov pro pozitivní a negativní recenze, stejně tak wordcloud, který je momentálně ze všech recenzí)
 fdist = FreqDist()
 for word in word_tokenize(clean_positive_reviews):
@@ -140,3 +127,4 @@ words = fdist.most_common(15)
 
 df_positive = pd.DataFrame(words ,columns=["word","count"])
 print(df_positive)
+"""
