@@ -3,6 +3,7 @@ import requests
 import json
 import csv
 import unicodedata
+import time
 
 #OTEVIRANI SOUBORU POMOCI KNIHOVNY XLRD, ROZDELENI OBSAHU PODLE RADKU
 workbook = xlrd.open_workbook('C:\\DA\\ProjectDA\\Excel\\sentiment.xlsx', 'rb')
@@ -46,10 +47,12 @@ stopwords_cz = prepositions + conjunctions + pronouns + verbs + prepositions_wit
 
 # VYTAHNE Z RADKU 2. HODNOTU - REVIEW A ROZDELÍ PODLE SENTIMENTU DO SEZNAMŮ
 reviews_all = []
+sentiment_all = []
 positive_reviews = []
 negative_reviews = []
 neutral_reviews = []
 for i in rows[1:]:
+    sentiment_all.append(i[2])
     reviews_all.append(i[1])
     if i[2] == 1:
         positive_reviews.append(i[1])
@@ -60,26 +63,25 @@ for i in rows[1:]:
 
 #request na API na FI MU
 #pouze jedna recenze, nechtěla jsem si to hend rozbít :D
-text = reviews_all[0]
+review_id = 76 #protože jsem skončila u 75 recenze
+for text in reviews_all[0:75]: #urpavit podle review id
+    url = "https://nlp.fi.muni.cz/languageservices/"
+    morphological_analysis = "service.py?call=tagger&lang=cs&output=json&text=" + text
+    res = requests.get(url + morphological_analysis + text, timeout=5)
+    cont = res.json()
+    list_of_words = cont["vertical"] #seznam seznamů ve slovníku vertical, lemmata jsou vždy na 1 místě v každém seznamu
 
-url = "https://nlp.fi.muni.cz/languageservices/"
-morphological_analysis = "service.py?call=tagger&lang=cs&output=json&text=" + text
-
-res = requests.get(url + morphological_analysis + text)
-cont = res.json()
-list_of_words = cont["vertical"] #seznam seznamů ve slovníku vertical, lemmata jsou vždy na 1 místě v každém seznamu
-
-#přidá lemmata slov, která nejsou ve stopslovech do listu, juhů
-lemmata = []
-for list in list_of_words:
-    try: #nutno mít v bloku try, protože některé seznamy nemají lemma
-        if list[1] not in stopwords_cz and len(list[1]) > 2: #podminka pro stopslova a kratší slova než tři znaky
-            lemmata.append(list[1])
-    except:
-        IndexError
-review_id = 1
-with open("lemmata.csv","a",encoding="utf-8", newline="") as f:
-    writer = csv.writer(f)
-    for lemma in lemmata:
-        writer.writerow([review_id]+[lemma])
+    #přidá lemmata slov, která nejsou ve stopslovech do listu, juhů
+    lemmata = []
+    for list in list_of_words:
+        try: #nutno mít v bloku try, protože některé seznamy nemají lemma
+            if list[1] not in stopwords_cz and len(list[1]) > 2: #podminka pro stopslova a kratší slova než tři znaky
+                lemmata.append(list[1])
+        except:
+            IndexError
+    with open("lemmata.csv","a",encoding="utf-8", newline="") as f:
+        writer = csv.writer(f)
+        for lemma in lemmata:
+            sentiment = sentiment_all[review_id-1]
+            writer.writerow([review_id]+[sentiment]+[lemma])
     review_id += 1
