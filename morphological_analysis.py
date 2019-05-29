@@ -51,6 +51,7 @@ sentiment_all = []
 positive_reviews = []
 negative_reviews = []
 neutral_reviews = []
+review_id_negative = []
 for i in rows[1:]:
     sentiment_all.append(i[2])
     reviews_all.append(i[1])
@@ -60,7 +61,8 @@ for i in rows[1:]:
         neutral_reviews.append(i[1])
     elif i[2] == -1:
         negative_reviews.append(i[1])
-
+        review_id_negative.append(i[0])
+"""
 #request na API na FI MU
 review_id = 76 #PROTOŽE JSEM SKONČILA U 75 RECENZE
 for text in reviews_all[0:75]: #TŘEBA UPRAVIT PODLE TOHO KDE SE SKONČILO (LIMIT API JE 500/DEN)
@@ -84,3 +86,18 @@ for text in reviews_all[0:75]: #TŘEBA UPRAVIT PODLE TOHO KDE SE SKONČILO (LIMI
             sentiment = sentiment_all[review_id-1]
             writer.writerow([review_id]+[sentiment]+[lemma])
     review_id += 1
+"""
+#POLITENESS (asi nemá smysl, četla jsem recenze, a asi tak dvě by mohly být "rude", některé navíc mají více než tisíc znaků, takže nejdou poslat)
+i = 0 #neodpovídá skutečnosti, protože bere jen z negativních recenzí
+for text in negative_reviews[0:20]: #nevím proč to nějaké vynechává
+    url = "https://nlp.fi.muni.cz/languageservices/"
+    politeness_of_text = "service.py?call=polite&lang=cs&output=json&text=" + text
+    res = requests.get(url + politeness_of_text + text, timeout=(10,15))
+    cont = res.json()
+    politeness_of_review = cont.get("politeness")
+    rude_words = cont.get("rudewords")
+
+    with open("politeness_of_negative_reviews.csv","a",encoding="utf-8", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow([review_id_negative[i]]+[politeness_of_review]+[rude_words])
+    i += 1
