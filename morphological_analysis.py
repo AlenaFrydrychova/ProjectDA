@@ -58,26 +58,28 @@ for i in rows[1:]:
     elif i[2] == -1:
         negative_reviews.append(i[1])
 
-#reguest na API na FI MU
+#request na API na FI MU
 #pouze jedna recenze, nechtěla jsem si to hend rozbít :D
 text = reviews_all[0]
+
 url = "https://nlp.fi.muni.cz/languageservices/"
 morphological_analysis = "service.py?call=tagger&lang=cs&output=json&text=" + text
 
 res = requests.get(url + morphological_analysis + text)
 cont = res.json()
-list_of_words = cont["vertical"]
+list_of_words = cont["vertical"] #seznam seznamů ve slovníku vertical, lemmata jsou vždy na 1 místě v každém seznamu
 
 #přidá lemmata slov, která nejsou ve stopslovech do listu, juhů
 lemmata = []
 for list in list_of_words:
-    try:
-        if list[1] not in stopwords_cz and len(list[1]) > 2:
+    try: #nutno mít v bloku try, protože některé seznamy nemají lemma
+        if list[1] not in stopwords_cz and len(list[1]) > 2: #podminka pro stopslova a kratší slova než tři znaky
             lemmata.append(list[1])
     except:
         IndexError
-
+review_id = 1
 with open("lemmata.csv","a",encoding="utf-8", newline="") as f:
     writer = csv.writer(f)
     for lemma in lemmata:
-        writer.writerow([lemma])
+        writer.writerow([review_id]+[lemma])
+    review_id += 1
