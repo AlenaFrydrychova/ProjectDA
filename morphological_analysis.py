@@ -62,9 +62,8 @@ for i in rows[1:]:
         negative_reviews.append(i[1])
 
 #request na API na FI MU
-#pouze jedna recenze, nechtěla jsem si to hend rozbít :D
-review_id = 76 #protože jsem skončila u 75 recenze
-for text in reviews_all[0:75]: #urpavit podle review id
+review_id = 76 #PROTOŽE JSEM SKONČILA U 75 RECENZE
+for text in reviews_all[0:75]: #TŘEBA UPRAVIT PODLE TOHO KDE SE SKONČILO (LIMIT API JE 500/DEN)
     url = "https://nlp.fi.muni.cz/languageservices/"
     morphological_analysis = "service.py?call=tagger&lang=cs&output=json&text=" + text
     res = requests.get(url + morphological_analysis + text, timeout=5)
