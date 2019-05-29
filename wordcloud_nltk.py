@@ -58,6 +58,7 @@ conjuctions_upper_without = [conjuction.upper() for conjuction in conjunctions_w
 pronouns_upper_without = [pronoun.upper() for pronoun in pronouns_without]
 verbs_upper_without = [verb.upper() for verb in verbs_without]
 
+# ALL STOPWORDS
 stopwords_cz = prepositions + conjunctions + pronouns + verbs + prepositions_without + pronouns_without + conjunctions_without + verbs_without + prepositions_upper + conjuctions_upper + pronouns_upper + verbs_upper + prepositions_upper_without + conjuctions_upper_without + pronouns_upper_without + verbs_upper_without + another_specific
 
 #WORDCLOUD
@@ -106,7 +107,7 @@ def get_concordance(list_of_reviews,concordance_word,count_of_lines,file):
     t = nltk.WhitespaceTokenizer()
     textList = Text(t.tokenize(string_reviews))
     #zápis do souboru (přesměruje výsledek printu do souboru)
-    sys.stdout = open(file, 'a', encoding="utf-8")
+    sys.stdout = open("txt\\" + file, 'a', encoding="utf-8")
     textList.concordance(concordance_word, lines=count_of_lines)
     #vrátí výsledky printu do příkazové řádky
     sys.stdout = sys.__stdout__
