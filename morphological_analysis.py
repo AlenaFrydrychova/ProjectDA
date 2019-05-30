@@ -6,11 +6,10 @@ import unicodedata
 import time
 import sys
 
-
 path_to_sentiment_xlsx = sys.argv[1]
 #do příkazové řádky je třeba napsat příkaz ve formě -> nazev souboru cesta
 #Andy -> morphological_analysis.py C:\\DA\\ProjectDA\\Excel\\sentiment.xlsx
-#ALena -> morphological_analysis.py C:\\Users\\Alena\\Documents\\DA Czechitas\\projekt\\ProjectDA\\Excel\\reviews.xlsx
+#ALena -> morphological_analysis.py C:\\Users\\Alena\\Documents\\DA Czechitas\\projekt\\ProjectDA\\Excel\\sentiment.xlsx
 
 #OTEVIRANI SOUBORU POMOCI KNIHOVNY XLRD, ROZDELENI OBSAHU PODLE RADKU
 workbook = xlrd.open_workbook(path_to_sentiment_xlsx, 'rb')
@@ -68,42 +67,67 @@ for i in rows[1:]:
     elif i[2] == -1:
         negative_reviews.append(i[1])
         review_id_negative.append(i[0])
-"""
+
+#split reviews that are logner than 1000characters
+all_reviews_after_splitting = []
+reviews_all_id = []
+id = 1
+for review in reviews_all:
+    number_of_characters = 950
+    split_review = []
+    if len(review) > number_of_characters:
+        for i in range(0, len(review), number_of_characters):
+            all_reviews_after_splitting.append(review[i:i+number_of_characters])
+            reviews_all_id.append(id)
+        id += 1
+    else:
+        all_reviews_after_splitting.append(review)
+        reviews_all_id.append(id)
+        id += 1
+
 #request na API na FI MU
-review_id = 76 #PROTOŽE JSEM SKONČILA U 75 RECENZE
-for text in reviews_all[0:75]: #TŘEBA UPRAVIT PODLE TOHO KDE SE SKONČILO (LIMIT API JE 500/DEN)
+
+i = 0 #musí se rovnat začátku rozsahu ve for cyklu níže (nelekat se, nebude se to rovnat tomu jaké id je v souboru lemmata.csv naposledy)
+for text in all_reviews_after_splitting[0:50]:
     url = "https://nlp.fi.muni.cz/languageservices/"
-    morphological_analysis = "service.py?call=tagger&lang=cs&output=json&text=" + text
+    morphological_analysis = "service.py?call=tagger&lang=cs&output=json&text="
     res = requests.get(url + morphological_analysis + text, timeout=5)
     cont = res.json()
-    list_of_words = cont["vertical"] #seznam seznamů ve slovníku vertical, lemmata jsou vždy na 1 místě v každém seznamu
-
+     #seznam seznamů ve slovníku vertical, lemmata jsou vždy na 1 místě v každém seznamu
     #přidá lemmata slov, která nejsou ve stopslovech do listu, juhů
     lemmata = []
+    try:
+        #někdy neexistuje, nenajde lemma ke slovu
+        list_of_words = cont["vertical"]
+    except KeyError:
+        pass
     for list in list_of_words:
-        try: #nutno mít v bloku try, protože některé seznamy nemají lemma
+        #někdy není lemma, nastal by indexerror
+        try:
             if list[1] not in stopwords_cz and len(list[1]) > 2: #podminka pro stopslova a kratší slova než tři znaky
                 lemmata.append(list[1])
-        except IndexError:
+        except (IndexError,KeyError):
             pass
     with open("lemmata.csv","a",encoding="utf-8", newline="") as f:
         writer = csv.writer(f)
         for lemma in lemmata:
-            sentiment = sentiment_all[review_id-1]
-            writer.writerow([review_id]+[sentiment]+[lemma])
-    review_id += 1
-"""
+            writer.writerow([round(reviews_all_id[i])]+[lemma])
+    i += 1
+
 """
 #POLITENESS (asi nemá smysl, četla jsem recenze, a asi tak dvě by mohly být "rude", některé navíc mají více než tisíc znaků, takže nejdou poslat)
-i = 0 #neodpovídá skutečnosti, protože bere jen z negativních recenzí
-for text in negative_reviews[0:20]: #nevím proč to nějaké vynechává
+i = 40 #neodpovídá skutečnosti, protože bere jen z negativních recenzí
+for text in negative_reviews[40:]: #nevím proč to nějaké vynechává
     url = "https://nlp.fi.muni.cz/languageservices/"
     politeness_of_text = "service.py?call=polite&lang=cs&output=json&text=" + text
-    res = requests.get(url + politeness_of_text + text, timeout=5)
+    res = requests.get(url + politeness_of_text + text, timeout=(60,60))
     cont = res.json()
-    politeness_of_review = cont.get("politeness")
-    rude_words = cont.get("rudewords")
-
+    try:
+        politeness_of_review = cont.get("politeness")
+        rude_words = cont.get("rudewords")
+    except KeyError:
+        politeness_of_text = "error"
+        rude_words = "error"
     with open("politeness_of_negative_reviews.csv","a",encoding="utf-8", newline="") as f:
         writer = csv.writer(f)
         writer.writerow([review_id_negative[i]]+[politeness_of_review]+[rude_words])
