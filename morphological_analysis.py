@@ -87,31 +87,32 @@ for review in reviews_all:
 
 #request na API na FI MU
 
-i = 0 #musí se rovnat začátku rozsahu ve for cyklu níže (nelekat se, nebude se to rovnat tomu jaké id je v souboru lemmata.csv naposledy)
-for text in all_reviews_after_splitting[0:50]:
+i = 500 #musí se rovnat začátku rozsahu ve for cyklu níže (nelekat se, nebude se to rovnat tomu jaké id je v souboru lemmata.csv naposledy)
+for text in all_reviews_after_splitting[500:600]:
     url = "https://nlp.fi.muni.cz/languageservices/"
     morphological_analysis = "service.py?call=tagger&lang=cs&output=json&text="
     res = requests.get(url + morphological_analysis + text, timeout=5)
     cont = res.json()
      #seznam seznamů ve slovníku vertical, lemmata jsou vždy na 1 místě v každém seznamu
     #přidá lemmata slov, která nejsou ve stopslovech do listu, juhů
-    lemmata = []
     try:
         #někdy neexistuje, nenajde lemma ke slovu
         list_of_words = cont["vertical"]
-    except KeyError:
+    except (KeyError,NameError):
         pass
-    for list in list_of_words:
-        #někdy není lemma, nastal by indexerror
-        try:
-            if list[1] not in stopwords_cz and len(list[1]) > 2: #podminka pro stopslova a kratší slova než tři znaky
-                lemmata.append(list[1])
-        except (IndexError,KeyError):
-            pass
-    with open("lemmata.csv","a",encoding="utf-8", newline="") as f:
-        writer = csv.writer(f)
-        for lemma in lemmata:
-            writer.writerow([round(reviews_all_id[i])]+[lemma])
+    try:
+        for list in list_of_words:
+            #někdy není lemma, nastal by indexerror
+            try:
+                if list[1] not in stopwords_cz and len(list[1]) > 2: #podminka pro stopslova a kratší slova než tři znaky
+                    with open("lemmata.csv","a",encoding="utf-8", newline="") as f:
+                        writer = csv.writer(f)
+                        writer.writerow([round(reviews_all_id[i])]+[list[1]])
+            except (IndexError,KeyError):
+                pass
+    except NameError:
+        print("Too many calls per day")
+        break
     i += 1
 
 """
