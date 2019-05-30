@@ -1,7 +1,7 @@
 import requests
 import csv
 import xlrd
-
+import sys
 
 """
 #FUKNCE NA ZJISTENI SENTIMENTU - POSLE REQUEST NA GENEEA.COM
@@ -15,8 +15,13 @@ def get_sentiment(chunk):
     return(r.json())
 """
 
+path_to_sentiment_xlsx = sys.argv[1]
+#do příkazové řádky je třeba napsat příkaz ve formě -> nazev souboru + cesta
+#Andy -> sentiment_frequent_phrases.py C:\\DA\\ProjectDA\\Excel\\sentiment.xlsx
+#Alena -> sentiment_frequent_phrases.py C:\\Users\\Alena\\Documents\\DA Czechitas\\projekt\\ProjectDA\\Excel\\sentiment.xlsx
+
 #OTEVIRANI SOUBORU POMOCI KNIHOVNY XLRD, ROZDELENI OBSAHU PODLE RADKU
-workbook = xlrd.open_workbook('C:\\Users\\Alena\\Documents\\DA Czechitas\\projekt\\ProjectDA\\Excel\\reviews.xlsx', 'rb')#('C:\\DA\\ProjectDA\\Excel\\reviews.xlsx', 'rb')
+workbook = xlrd.open_workbook(path_to_sentiment_xlsx, 'rb')
 sheet = workbook.sheet_by_index(0)
 rows = []
 for i in range(sheet.nrows):
@@ -28,7 +33,7 @@ for i in range(sheet.nrows):
 # VYTAHNE Z RADKU 3. HODNOTU - REVIEW
 reviews = []
 for i in rows[1:]:
-    reviews.append(i[2])
+    reviews.append(i[1])
 
 """
 #POUZIJE FUNKCI ANALYZUJ_RECENZI A HODNOTY ULOZI DO LISTU

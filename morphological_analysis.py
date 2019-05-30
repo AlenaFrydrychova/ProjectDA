@@ -4,10 +4,16 @@ import json
 import csv
 import unicodedata
 import time
+import sys
+
+
+path_to_sentiment_xlsx = sys.argv[1]
+#do příkazové řádky je třeba napsat příkaz ve formě -> nazev souboru cesta
+#Andy -> morphological_analysis.py C:\\DA\\ProjectDA\\Excel\\sentiment.xlsx
+#ALena -> morphological_analysis.py C:\\Users\\Alena\\Documents\\DA Czechitas\\projekt\\ProjectDA\\Excel\\reviews.xlsx
 
 #OTEVIRANI SOUBORU POMOCI KNIHOVNY XLRD, ROZDELENI OBSAHU PODLE RADKU
-workbook = xlrd.open_workbook('C:\\DA\\ProjectDA\\Excel\\sentiment.xlsx', 'rb')
-#'C:\\Users\\Alena\\Documents\\DA Czechitas\\projekt\\ProjectDA\\Excel\\reviews.xlsx', 'rb')#
+workbook = xlrd.open_workbook(path_to_sentiment_xlsx, 'rb')
 
 sheet = workbook.sheet_by_index(0)
 rows = []
@@ -78,8 +84,8 @@ for text in reviews_all[0:75]: #TŘEBA UPRAVIT PODLE TOHO KDE SE SKONČILO (LIMI
         try: #nutno mít v bloku try, protože některé seznamy nemají lemma
             if list[1] not in stopwords_cz and len(list[1]) > 2: #podminka pro stopslova a kratší slova než tři znaky
                 lemmata.append(list[1])
-        except:
-            IndexError
+        except IndexError:
+            pass
     with open("lemmata.csv","a",encoding="utf-8", newline="") as f:
         writer = csv.writer(f)
         for lemma in lemmata:
@@ -87,12 +93,13 @@ for text in reviews_all[0:75]: #TŘEBA UPRAVIT PODLE TOHO KDE SE SKONČILO (LIMI
             writer.writerow([review_id]+[sentiment]+[lemma])
     review_id += 1
 """
+"""
 #POLITENESS (asi nemá smysl, četla jsem recenze, a asi tak dvě by mohly být "rude", některé navíc mají více než tisíc znaků, takže nejdou poslat)
 i = 0 #neodpovídá skutečnosti, protože bere jen z negativních recenzí
 for text in negative_reviews[0:20]: #nevím proč to nějaké vynechává
     url = "https://nlp.fi.muni.cz/languageservices/"
     politeness_of_text = "service.py?call=polite&lang=cs&output=json&text=" + text
-    res = requests.get(url + politeness_of_text + text, timeout=(10,15))
+    res = requests.get(url + politeness_of_text + text, timeout=5)
     cont = res.json()
     politeness_of_review = cont.get("politeness")
     rude_words = cont.get("rudewords")
@@ -101,3 +108,4 @@ for text in negative_reviews[0:20]: #nevím proč to nějaké vynechává
         writer = csv.writer(f)
         writer.writerow([review_id_negative[i]]+[politeness_of_review]+[rude_words])
     i += 1
+"""
