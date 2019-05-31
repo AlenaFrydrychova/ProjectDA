@@ -86,12 +86,11 @@ for review in reviews_all:
         id += 1
 
 #request na API na FI MU
-
-i = 1364 #musí se rovnat začátku rozsahu ve for cyklu níže (nelekat se, nebude se to rovnat tomu jaké id je v souboru lemmata.csv naposledy)
-for text in all_reviews_after_splitting[1364:1370]:
+i = 800 #musí se rovnat začátku rozsahu ve for cyklu níže (nelekat se, nebude se to rovnat tomu jaké id je v souboru lemmata.csv naposledy)
+for text in all_reviews_after_splitting[800:900]:
     url = "https://nlp.fi.muni.cz/languageservices/"
     morphological_analysis = "service.py?call=tagger&lang=cs&output=json&text="
-    res = requests.get(url + morphological_analysis + text, timeout=10)
+    res = requests.get(url + morphological_analysis + text, timeout=5)
     cont = res.json()
      #seznam seznamů ve slovníku vertical, lemmata jsou vždy na 1 místě v každém seznamu
     #přidá lemmata slov, která nejsou ve stopslovech do listu, juhů
@@ -108,17 +107,17 @@ for text in all_reviews_after_splitting[1364:1370]:
                     with open("lemmata.csv","a",encoding="utf-8", newline="") as f:
                         writer = csv.writer(f)
                         writer.writerow([round(reviews_all_id[i])]+[list[1]])
-            except (IndexError,KeyError):
+            except IndexError:
                 pass
     except NameError:
         print("Too many calls per day")
         break
     i += 1
-
+    time.sleep(1)
 """
 #POLITENESS (asi nemá smysl, četla jsem recenze, a asi tak dvě by mohly být "rude", některé navíc mají více než tisíc znaků, takže nejdou poslat)
-i = 40 #neodpovídá skutečnosti, protože bere jen z negativních recenzí
-for text in negative_reviews[40:]: #nevím proč to nějaké vynechává
+i = 300 #neodpovídá skutečnosti, protože bere jen z negativních recenzí
+for text in negative_reviews[300:]: #nevím proč to nějaké vynechává
     url = "https://nlp.fi.muni.cz/languageservices/"
     politeness_of_text = "service.py?call=polite&lang=cs&output=json&text=" + text
     res = requests.get(url + politeness_of_text + text, timeout=(60,60))
@@ -127,10 +126,11 @@ for text in negative_reviews[40:]: #nevím proč to nějaké vynechává
         politeness_of_review = cont.get("politeness")
         rude_words = cont.get("rudewords")
     except KeyError:
-        politeness_of_text = "error"
+        politeness_of_review = "error"
         rude_words = "error"
     with open("politeness_of_negative_reviews.csv","a",encoding="utf-8", newline="") as f:
         writer = csv.writer(f)
         writer.writerow([review_id_negative[i]]+[politeness_of_review]+[rude_words])
     i += 1
+    time.sleep(1)
 """
