@@ -87,11 +87,11 @@ for review in reviews_all:
 
 #request na API na FI MU
 
-i = 900 #musí se rovnat začátku rozsahu ve for cyklu níže (nelekat se, nebude se to rovnat tomu jaké id je v souboru lemmata.csv naposledy)
-for text in all_reviews_after_splitting[900:1000]:
+i = 1364 #musí se rovnat začátku rozsahu ve for cyklu níže (nelekat se, nebude se to rovnat tomu jaké id je v souboru lemmata.csv naposledy)
+for text in all_reviews_after_splitting[1364:1370]:
     url = "https://nlp.fi.muni.cz/languageservices/"
     morphological_analysis = "service.py?call=tagger&lang=cs&output=json&text="
-    res = requests.get(url + morphological_analysis + text, timeout=5)
+    res = requests.get(url + morphological_analysis + text, timeout=10)
     cont = res.json()
      #seznam seznamů ve slovníku vertical, lemmata jsou vždy na 1 místě v každém seznamu
     #přidá lemmata slov, která nejsou ve stopslovech do listu, juhů
