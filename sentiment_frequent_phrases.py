@@ -84,21 +84,25 @@ for key_word in key_words:
 
 #STOPWORDS WITH DIACRITICS LOWERCASE
 prepositions = ["od","z","s","do","bez","krom","kromě","podle","okolo","vedle","během","prostřednictvím","u","za","k","před","na","oproti","naproti","proti","pro", "mimo", "pod","nad","mezi","skrz","o","po","v"]
-conjunctions = ["že", "a", "i", "ani", "nebo", "či", "přímo", "nadto", "ani", "jak", "tak", "hned", "jednak", "zčásti", "dílem", "ale", "avšak", "však", "leč", "nýbrž", "naopak", "jenomže", "jenže", "sice", "jistě", "ale", "i", "ba", "ba i", "ba ani", "nadto", "dokonce", "nejen", "nebo", "anebo", "buď", "totiž", "vždyť", "neboť", "vždyť", "totiž", "však", "také", "proto", "a proto", "a tak", "tudíž", "a tudíž", "tedy"]
-pronouns = ["já", "ty", "on", "ona", "ono", "my", "vy", "oni", "ony", "ona","se", "můj", "tvůj", "jeho", "její", "náš", "váš", "svůj", "ten", "tento", "tenhle", "onen", "takový", "týž", "tentýž", "sám", "kdo", "co", "jaký", "který","čí", "jenž", "nikdo", "nic", "nijaký", "ničí", "žádný", "někdo", "nějaký", "některý", "lecco", "něčí", "něco"]
+conjunctions = ["protože", "když", "jako", "takže", "že", "a", "i", "ani", "nebo", "či", "přímo", "nadto", "ani", "jak", "tak", "hned", "jednak", "zčásti", "dílem", "ale", "avšak", "však", "leč", "nýbrž", "naopak", "jenomže", "jenže", "sice", "jistě", "ale", "i", "ba", "ba i", "ba ani", "nadto", "dokonce", "nejen", "nebo", "anebo", "buď", "totiž", "vždyť", "neboť", "vždyť", "totiž", "však", "také", "proto", "a proto", "a tak", "tudíž", "a tudíž", "tedy"]
+pronouns = ["mé", "toto", "tím", "by", "ta", "já", "ty", "on", "ona", "ono", "my", "vy", "oni", "ony", "ona","se", "můj", "tvůj", "jeho", "její", "náš", "váš", "svůj", "ten", "tento", "této", "tato", "tahle", "téhle", "to", "se", "tenhle", "onen", "takový", "týž", "tentýž", "sám", "kdo", "co", "jaký", "který","čí", "jenž", "nikdo", "nic", "nijaký", "ničí", "žádný", "někdo", "nějaký", "některý", "lecco", "něčí", "něco"]
+others = ['tomu', '(ale', 'taky', 'aby', 'abych', 'pak', 'všem', 'bych', 'jiná', 'mnou', 'přes', 'jiné', 'si', 'naši', 'naší', 'vaši', 'vaší', 'prostě', 'tomto', 'mně', 'např', 'např.', ',', 'tak', 'tuto', 'svou', 'nám']
 #STOPWORDS WITHOUT DIACRITICS LOWERCASE
 prepositions_without = [''.join((c for c in unicodedata.normalize('NFD', preposition) if unicodedata.category(c) != 'Mn')) for preposition in prepositions]
 pronouns_without = [''.join((c for c in unicodedata.normalize('NFD', pronoun) if unicodedata.category(c) != 'Mn')) for pronoun in pronouns]
 conjunctions_without = [''.join((c for c in unicodedata.normalize('NFD', conjunction) if unicodedata.category(c) != 'Mn')) for conjunction in conjunctions]
+others_without = [''.join((c for c in unicodedata.normalize('NFD', other) if unicodedata.category(c) != 'Mn')) for other in others]
 #STOPWORDS WITH DIACRITICS UPPERCASE
 prepositions_upper = [preposition.upper() for preposition in prepositions]
 conjuctions_upper = [conjuction.upper() for conjuction in conjunctions]
 pronouns_upper = [pronoun.upper() for pronoun in pronouns]
+others_upper = [other.upper() for other in others]
 #STOPWORDS WITHOUT DIACRITICS UPPERCASE
 prepositions_upper_without = [preposition.upper() for preposition in prepositions_without]
 conjuctions_upper_without = [conjuction.upper() for conjuction in conjunctions_without]
 pronouns_upper_without = [pronoun.upper() for pronoun in pronouns_without]
-stopwords_cz = prepositions + conjunctions + pronouns + prepositions_without + pronouns_without + conjunctions_without + prepositions_upper + conjuctions_upper + pronouns_upper + prepositions_upper_without + conjuctions_upper_without + pronouns_upper_without
+others_upper_without = [other.upper() for other in others_without]
+stopwords_cz = others + others_without + others_upper + others_upper_without + prepositions + conjunctions + pronouns + prepositions_without + pronouns_without + conjunctions_without + prepositions_upper + conjuctions_upper + pronouns_upper + prepositions_upper_without + conjuctions_upper_without + pronouns_upper_without
 
 
 extract_re = re.compile(r'^.*\.+.*$')
@@ -106,14 +110,14 @@ for extract in extracts_prev:
     for i in extract:
         if len(i) < 4:
             extract.remove(i)
-        elif i.endswith('.') or i == extract_re or i in stopwords_cz:
+        elif i.endswith('.') or extract_re.match(i) or i in stopwords_cz:
             extract.remove(i)
 
 for extract in extracts_next:
     for i in extract:
         if len(i) < 4:
             extract.remove(i)
-        elif i.endswith('.') or i == extract_re or i in stopwords_cz:
+        elif i.endswith('.') or i == extract_re.match(i) or i in stopwords_cz:
             extract.remove(i)
 
 
@@ -131,13 +135,13 @@ for extract in list_jidlo_prev:
     for word in extract:
         if word == 'jídlo':
             pass
+        elif word in stopwords_cz:
+            pass
         elif word in Dict_jidlo_prev:
             Dict_jidlo_prev[word] += 1
         else:
             Dict_jidlo_prev[word] = 1
 
-Dict_jidlo_prev = heapq.nlargest(50, Dict_jidlo_prev, key=Dict_jidlo_prev.get)
-#print(Dict_jidlo_prev)
 
 for extract in extracts_next:
     if key_words[0] in extract:
@@ -147,13 +151,24 @@ for extract in list_jidlo_next:
     for word in extract:
         if word == 'jídlo':
             pass
+        elif word in stopwords_cz:
+            pass
         elif word in Dict_jidlo_next:
             Dict_jidlo_next[word] += 1
         else:
             Dict_jidlo_next[word] = 1
 
-Dict_jidlo_next = heapq.nlargest(50, Dict_jidlo_next, key=Dict_jidlo_next.get)
-#print(Dict_jidlo_next)
+
+Dict_jidlo_prev = sorted(Dict_jidlo_prev.items(), key=lambda kv: kv[1], reverse=True)
+Dict_jidlo_next = sorted(Dict_jidlo_next.items(), key=lambda kv: kv[1], reverse=True)
+
+n = 0
+for i in Dict_jidlo_prev:
+    try:
+        print(i, key_words[0], Dict_jidlo_next[n])
+        n += 1
+    except IndexError:
+        pass
 
 
 list_obsluha_prev = []
@@ -169,13 +184,13 @@ for extract in list_obsluha_prev:
     for word in extract:
         if word == 'obsluha':
             pass
+        elif word in stopwords_cz:
+            pass
         elif word in Dict_obsluha_prev:
             Dict_obsluha_prev[word] += 1
         else:
             Dict_obsluha_prev[word] = 1
 
-Dict_obsluha_prev = heapq.nlargest(50, Dict_obsluha_prev, key=Dict_obsluha_prev.get)
-#print(Dict_obsluha_prev)
 
 for extract in extracts_next:
     if key_words[1] in extract:
@@ -185,13 +200,23 @@ for extract in list_obsluha_next:
     for word in extract:
         if word == 'obsluha':
             pass
+        elif word in stopwords_cz:
+            pass
         elif word in Dict_obsluha_next:
             Dict_obsluha_next[word] += 1
         else:
             Dict_obsluha_next[word] = 1
 
-Dict_obsluha_next = heapq.nlargest(50, Dict_obsluha_next, key=Dict_obsluha_next.get)
-#print(Dict_obsluha_next)
+Dict_obsluha_prev = sorted(Dict_obsluha_prev.items(), key=lambda kv: kv[1], reverse=True)
+Dict_obsluha_next = sorted(Dict_obsluha_next.items(), key=lambda kv: kv[1], reverse=True)
+
+n = 0
+for i in Dict_obsluha_prev:
+    try:
+        print(i, key_words[1], Dict_obsluha_next[n])
+        n += 1
+    except IndexError:
+        pass
 
 
 list_restaurace_prev = []
@@ -208,6 +233,8 @@ for extract in list_restaurace_prev:
     for word in extract:
         if word == 'restaurace':
             pass
+        elif word in stopwords_cz:
+            pass
         elif word in Dict_restaurace_prev:
             Dict_restaurace_prev[word] += 1
         else:
@@ -222,6 +249,8 @@ for extract in list_restaurace_next:
     for word in extract:
         if word == 'restaurace':
             pass
+        elif word in stopwords_cz:
+            pass
         elif word in Dict_restaurace_next:
             Dict_restaurace_next[word] += 1
         else:
@@ -230,9 +259,44 @@ for extract in list_restaurace_next:
 Dict_restaurace_prev = sorted(Dict_restaurace_prev.items(), key=lambda kv: kv[1], reverse=True)
 Dict_restaurace_next = sorted(Dict_restaurace_next.items(), key=lambda kv: kv[1], reverse=True)
 
-n = 0
-for i in Dict_restaurace_prev:
-    print(i, key_words[2], Dict_restaurace_next[n])
-    n += 1
 
 
+with open("frequent_words.csv","w",encoding="utf-8", newline="") as f:
+    writer = csv.writer(f)
+    to_file = ''
+    n = 0
+    next = ''
+    for i in Dict_jidlo_prev:
+        try:
+            i = str(i)
+            next = str(Dict_jidlo_next[n])
+            to_file = (i.replace(',', '#').replace('()', ''), key_words[0], next.replace('""', '').replace(',', '#').replace('()', ''))
+            writer.writerow(to_file)
+            n += 1
+        except IndexError:
+            pass
+    to_file = ''
+    n = 0
+    next = ''
+    for i in Dict_obsluha_prev:
+        try:
+            i = str(i)
+            next = str(Dict_obsluha_next[n])
+            to_file = (i.replace(',', '#').replace('()', ''), key_words[1], next.replace('""', '').replace(',', '#').replace('()', ''))
+            writer.writerow(to_file)
+            n += 1
+        except IndexError:
+            pass
+    to_file = ''
+    n = 0
+    next = ''
+    for i in Dict_restaurace_prev:
+        try:
+            i = str(i)
+            next = str(Dict_restaurace_next[n])
+            to_file = (i.replace(',', '#').replace('()', ''), key_words[2], next.replace('""', '').replace(',', '#').replace('()', ''))
+            writer.writerow(to_file)
+            n += 1
+        except IndexError:
+            pass
+    
