@@ -84,7 +84,7 @@ for review in reviews_all:
         all_reviews_after_splitting.append(review)
         reviews_all_id.append(id)
         id += 1
-
+"""
 #request na API na FI MU
 i = 2400 #musí se rovnat začátku rozsahu ve for cyklu níže (nelekat se, nebude se to rovnat tomu jaké id je v souboru lemmata.csv naposledy)
 for text in all_reviews_after_splitting[2400:2500]:
@@ -116,8 +116,8 @@ for text in all_reviews_after_splitting[2400:2500]:
     time.sleep(1)
 """
 #POLITENESS (asi nemá smysl, četla jsem recenze, a asi tak dvě by mohly být "rude", některé navíc mají více než tisíc znaků, takže nejdou poslat)
-i = 300 #neodpovídá skutečnosti, protože bere jen z negativních recenzí
-for text in negative_reviews[300:]: #nevím proč to nějaké vynechává
+i = 0 #neodpovídá skutečnosti, protože bere jen z negativních recenzí
+for text in negative_reviews[0:]: #nevím proč to nějaké vynechává
     url = "https://nlp.fi.muni.cz/languageservices/"
     politeness_of_text = "service.py?call=polite&lang=cs&output=json&text=" + text
     res = requests.get(url + politeness_of_text + text, timeout=(60,60))
@@ -133,4 +133,3 @@ for text in negative_reviews[300:]: #nevím proč to nějaké vynechává
         writer.writerow([review_id_negative[i]]+[politeness_of_review]+[rude_words])
     i += 1
     time.sleep(1)
-"""
