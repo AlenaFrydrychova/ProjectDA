@@ -9,7 +9,7 @@ import sys
 path_to_sentiment_xlsx = sys.argv[1]
 #do příkazové řádky je třeba napsat příkaz ve formě -> nazev souboru cesta
 #Andy -> morphological_analysis.py C:\\DA\\ProjectDA\\Excel\\sentiment.xlsx
-#ALena -> morphological_analysis.py C:\\Users\\Alena\\Documents\\DA Czechitas\\projekt\\ProjectDA\\Excel\\sentiment.xlsx
+#ALena -> morphological_analysis.py C:\\Users\\Alena\\Documents\\DA_Czechitas\\projekt\\ProjectDA\\Excel\\sentiment.xlsx
 
 #OTEVIRANI SOUBORU POMOCI KNIHOVNY XLRD, ROZDELENI OBSAHU PODLE RADKU
 workbook = xlrd.open_workbook(path_to_sentiment_xlsx, 'rb')
@@ -86,8 +86,8 @@ for review in reviews_all:
         id += 1
 
 #request na API na FI MU
-i = 1400 #musí se rovnat začátku rozsahu ve for cyklu níže (nelekat se, nebude se to rovnat tomu jaké id je v souboru lemmata.csv naposledy)
-for text in all_reviews_after_splitting[1400:1900]:
+i = 1900 #musí se rovnat začátku rozsahu ve for cyklu níže (nelekat se, nebude se to rovnat tomu jaké id je v souboru lemmata.csv naposledy)
+for text in all_reviews_after_splitting[1900:2400]:
     url = "https://nlp.fi.muni.cz/languageservices/"
     morphological_analysis = "service.py?call=tagger&lang=cs&output=json&text="
     res = requests.get(url + morphological_analysis + text, timeout=5)
