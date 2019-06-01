@@ -86,8 +86,8 @@ for review in reviews_all:
         id += 1
 
 #request na API na FI MU
-i = 1900 #musí se rovnat začátku rozsahu ve for cyklu níže (nelekat se, nebude se to rovnat tomu jaké id je v souboru lemmata.csv naposledy)
-for text in all_reviews_after_splitting[1900:2400]:
+i = 2400 #musí se rovnat začátku rozsahu ve for cyklu níže (nelekat se, nebude se to rovnat tomu jaké id je v souboru lemmata.csv naposledy)
+for text in all_reviews_after_splitting[2400:2500]:
     url = "https://nlp.fi.muni.cz/languageservices/"
     morphological_analysis = "service.py?call=tagger&lang=cs&output=json&text="
     res = requests.get(url + morphological_analysis + text, timeout=5)

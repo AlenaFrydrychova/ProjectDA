@@ -60,7 +60,7 @@ verbs_upper_without = [verb.upper() for verb in verbs_without]
 
 # ALL STOPWORDS
 stopwords_cz = prepositions + conjunctions + pronouns + verbs + prepositions_without + pronouns_without + conjunctions_without + verbs_without + prepositions_upper + conjuctions_upper + pronouns_upper + verbs_upper + prepositions_upper_without + conjuctions_upper_without + pronouns_upper_without + verbs_upper_without + another_specific
-
+"""
 #WORDCLOUD
 def wordcloud_color(word=None, font_size=None, position=None, orientation=None, font_path=None, random_state=None):
     h = color
@@ -88,8 +88,8 @@ wordcloud_to_file(positive_reviews,"positive_reviews.png")
 
 color = 21
 wordcloud_to_file(negative_reviews,"negative_reviews.png")
-
 """
+
 #KNIHOVNA NLTK
 import nltk
 from nltk.tokenize import word_tokenize
@@ -111,21 +111,31 @@ def get_concordance(list_of_reviews,concordance_word,count_of_lines,file):
     textList.concordance(concordance_word, lines=count_of_lines)
     #vrátí výsledky printu do příkazové řádky
     sys.stdout = sys.__stdout__
+#JE TŘEBA PREVEST REVIEWS NA LOWER CASE, TAKHLE TO NAJDE JEN VÝSKYTY PŘEŠNĚ PODLE TOHO JAK SLOVO ZADÁM
+get_concordance(positive_reviews,"obsluha",2000,"obsluha_concordance_positive.txt")
+get_concordance(negative_reviews,"obsluha",2000,"obsluha_concordance_negative.txt")
+get_concordance(reviews_all,"obsluha",2000,"obsluha_concordance_all.txt")
 
-get_concordance(positive_reviews,"obsluha",1167,"concordance_positive.txt")
-get_concordance(negative_reviews,"obsluha",136,"concordance_negative.txt")
-get_concordance(reviews_all,"obsluha",1935,"concordance_all.txt")
-"""
+get_concordance(positive_reviews,"restaurace",2000,"restaurace_concordance_positive.txt")
+get_concordance(negative_reviews,"restaurace",2000,"restaurace_concordance_negative.txt")
+get_concordance(reviews_all,"restaurace",2000,"restaurace_concordance_all.txt")
+
+get_concordance(positive_reviews,"jídlo",2000,"jídlo_concordance_positive.txt")
+get_concordance(negative_reviews,"jídlo",2000,"jídlo_concordance_negative.txt")
+get_concordance(reviews_all,"jídlo",2000,"jídlo_concordance_all.txt")
+
+
 """
 #lexikální bohatost textu neboli počet odlišných slov v textu (v procentech)
 richness = (len(set(textList)) / len(textList))*100
 print(round(richness,2), "%")
-"""
+
 #FREKVENCE SLOV (potřeba lemmatizovat alespoň některá a zapsat je do nějaké tabulky, ideální by bylo udělat zvlášť frekvenci slov pro pozitivní a negativní recenze, stejně tak wordcloud, který je momentálně ze všech recenzí)
 fdist = FreqDist()
-for word in word_tokenize(clean_positive_reviews):
+for word in word_tokenize(positive_reviews):
     fdist[word.lower()] += 1
 words = fdist.most_common(15)
 
 df_positive = pd.DataFrame(words ,columns=["word","count"])
 print(df_positive)
+"""
