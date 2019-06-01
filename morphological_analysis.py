@@ -104,7 +104,7 @@ for text in all_reviews_after_splitting[2400:2500]:
             #někdy není lemma, nastal by indexerror
             try:
                 if list[1] not in stopwords_cz and len(list[1]) > 2: #podminka pro stopslova a kratší slova než tři znaky
-                    with open("lemmata.csv","a",encoding="utf-8", newline="") as f:
+                    with open("csv\\lemmata.csv","a",encoding="utf-8", newline="") as f:
                         writer = csv.writer(f)
                         writer.writerow([round(reviews_all_id[i])]+[list[1]])
             except IndexError:
@@ -128,7 +128,7 @@ for text in negative_reviews[300:]: #nevím proč to nějaké vynechává
     except KeyError:
         politeness_of_review = "error"
         rude_words = "error"
-    with open("politeness_of_negative_reviews.csv","a",encoding="utf-8", newline="") as f:
+    with open("csv\\politeness_of_negative_reviews.csv","a",encoding="utf-8", newline="") as f:
         writer = csv.writer(f)
         writer.writerow([review_id_negative[i]]+[politeness_of_review]+[rude_words])
     i += 1

@@ -80,6 +80,7 @@ def wordcloud_to_file(list_of_text,file):
     # plt.show()
     wordcloud.to_file("img\\" + file)
 
+#až budou lemma. tak zmenit listy
 color = 60
 wordcloud_to_file(reviews_all,"all_reviews.png")
 
@@ -97,7 +98,7 @@ from nltk.text import Text
 from nltk.probability import FreqDist
 from nltk.stem import WordNetLemmatizer
 import sys
-
+"""
 def get_concordance(list_of_reviews,concordance_word,count_of_lines,file):
     string_reviews = "\n".join(list_of_reviews)
     tokens = nltk.tokenize.word_tokenize(string_reviews)
@@ -124,18 +125,27 @@ get_concordance(positive_reviews,"jídlo",2000,"jídlo_concordance_positive.txt"
 get_concordance(negative_reviews,"jídlo",2000,"jídlo_concordance_negative.txt")
 get_concordance(reviews_all,"jídlo",2000,"jídlo_concordance_all.txt")
 
-
+"""
 """
 #lexikální bohatost textu neboli počet odlišných slov v textu (v procentech)
 richness = (len(set(textList)) / len(textList))*100
 print(round(richness,2), "%")
+"""
 
 #FREKVENCE SLOV (potřeba lemmatizovat alespoň některá a zapsat je do nějaké tabulky, ideální by bylo udělat zvlášť frekvenci slov pro pozitivní a negativní recenze, stejně tak wordcloud, který je momentálně ze všech recenzí)
-fdist = FreqDist()
-for word in word_tokenize(positive_reviews):
-    fdist[word.lower()] += 1
-words = fdist.most_common(15)
+def get_frequent_words(list_of_words, file):
+    string_reviews = "\n".join(list_of_words)
+    tokens = nltk.tokenize.word_tokenize(string_reviews)
+    tokens = [token for token in tokens if not token in stopwords_cz]
+    clean_reviews = " ".join(tokens)
+    fdist = FreqDist()
+    for word in word_tokenize(clean_reviews):
+        fdist[word.lower()] += 1
+    words = fdist.most_common(15)
 
-df_positive = pd.DataFrame(words ,columns=["word","count"])
-print(df_positive)
-"""
+    df = pd.DataFrame(words ,columns=["word","count"])
+    export_csv = df.to_csv ("C:\\DA\\ProjectDA\\csv\\" + file, index = None, header=True)
+
+get_frequent_words(reviews_all, "frequent_words_all.csv")
+get_frequent_words(positive_reviews, "frequent_words_positive.csv")
+get_frequent_words(negative_reviews, "frequent_words_negative.csv")
