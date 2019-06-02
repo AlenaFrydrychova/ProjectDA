@@ -84,10 +84,10 @@ for review in reviews_all:
         all_reviews_after_splitting.append(review)
         reviews_all_id.append(id)
         id += 1
-"""
+
 #request na API na FI MU
-i = 2400 #musí se rovnat začátku rozsahu ve for cyklu níže (nelekat se, nebude se to rovnat tomu jaké id je v souboru lemmata.csv naposledy)
-for text in all_reviews_after_splitting[2400:2500]:
+i = 3500 #musí se rovnat začátku rozsahu ve for cyklu níže (nelekat se, nebude se to rovnat tomu jaké id je v souboru lemmata.csv naposledy)
+for text in all_reviews_after_splitting[3500:3501]:
     url = "https://nlp.fi.muni.cz/languageservices/"
     morphological_analysis = "service.py?call=tagger&lang=cs&output=json&text="
     res = requests.get(url + morphological_analysis + text, timeout=5)
@@ -133,3 +133,4 @@ for text in negative_reviews[0:]: #nevím proč to nějaké vynechává
         writer.writerow([review_id_negative[i]]+[politeness_of_review]+[rude_words])
     i += 1
     time.sleep(1)
+"""

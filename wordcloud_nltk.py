@@ -5,12 +5,13 @@ from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 import matplotlib.pyplot as plt
 import unicodedata
 import random
-
-
+import sys
+"""
 #OTEVIRANI SOUBORU POMOCI KNIHOVNY XLRD, ROZDELENI OBSAHU PODLE RADKU
-workbook = xlrd.open_workbook('C:\\DA\\ProjectDA\\Excel\\sentiment.xlsx', 'rb')
+path_to_sentiment_xlsx = sys.argv[1]
+workbook = xlrd.open_workbook(path_to_sentiment_xlsx, 'rb')
 #'C:\\Users\\Alena\\Documents\\DA Czechitas\\projekt\\ProjectDA\\Excel\\sentiment.xlsx', 'rb')#
-
+# C:\\DA\\ProjectDA\\Excel\\sentiment.xlsx
 sheet = workbook.sheet_by_index(0)
 rows = []
 for i in range(sheet.nrows):
@@ -32,13 +33,14 @@ for i in rows[1:]:
         neutral_reviews.append(i[1])
     elif i[2] == -1:
         negative_reviews.append(i[1])
-
+"""
 #STOPWORDS WITH DIACRITICS LOWERCASE
 prepositions = ["od","z","s","do","bez","krom","kromě","podle","okolo","vedle","během","prostřednictvím","u","za","k","před","na","oproti","naproti","proti","pro", "mimo", "pod","nad","mezi","skrz","o","po","v"]
 conjunctions = ["a", "i", "ani", "nebo", "či", "přímo", "nadto", "ani", "jak", "tak", "hned", "jednak", "zčásti", "dílem", "ale", "avšak", "však", "leč", "nýbrž", "naopak", "jenomže", "jenže", "sice", "jistě", "ale", "i", "ba", "ba i", "ba ani", "nadto", "dokonce", "nejen", "nebo", "anebo", "buď", "totiž", "vždyť", "neboť", "vždyť", "totiž", "však", "také", "proto", "a proto", "a tak", "tudíž", "a tudíž", "tedy"]
 pronouns = ["já", "ty", "on", "ona", "ono", "my", "vy", "oni", "ony", "ona","se", "můj", "tvůj", "jeho", "její", "náš", "váš", "svůj", "ten", "tento", "tenhle", "onen", "takový", "týž", "tentýž", "sám", "kdo", "co", "jaký", "který","čí", "jenž", "nikdo", "nic", "nijaký", "ničí", "žádný", "někdo", "nějaký", "některý", "lecco", "něčí", "něco"]
 verbs = ["být","bejt","jsem","jsi","je","jest","jsme","jste","jsou","budu","budeš","bude","budeme","budete","budou","buď","budiž","buďme","buďmež","buďte","buďtež","byl","byla","bylo","byli","byly","jsa","jsouc","jsouce","byv","byvše","byvši","bych","bychom","bys","byste","by", "seš", "mám","máš","má","máme","máte","mají","měj","mějme","mějte","měl","měla","mělo","měli","měly","maje","majíc","majíce"]
-another_specific = ["si","nebylo","nebyla","cca","dne","jen","mi","mě","tady","tomu","že","to","nám","ná","takže","jako","už","pokud","asi","celkem","docela","tam","dali","ze","ve","ji","ta","pak","taky","což","tím","již","možná","která","toho","protože","sem","kde","která","které","tu","než","když","Kč","při","až","ho","této","mne","aby","nebyl","tuto","tom","No","kdy","dal","nebyla","jejich","jinak","zde","kterou","toto","dala","ní","nás","mu","dostali","objednali","jím","myslím","jim","Já","Jen","námi","Na","Po","není",")","(",".",",",":","!","...","-","?"]
+another_specific = ["jít","muset","jeden","druhý","moct","opravdu","všechen","mít","moc","dostat","chtít","dát","si","cca","dne","jen","mi","mě","tady","tomu","že","to","nám","ná","takže","jako","už","pokud","asi","celkem","docela","tam","ze","ve","ji","ta","pak","taky","což","tím","již","možná","která","toho","protože","sem","kde","která","které","tu","než","když","Kč","při","až","ho","této","mne","aby","tuto","tom","No","kdy","jejich","jinak","zde","kterou","toto","ní","nás","mu","dostali","objednali","jím","myslím","jim","Já","Jen","námi","Na","Po","není",")","(",".",",",":","!","...","-","?"]
+text_specific_stopwords = ["jídlo","obsluha","restaurace","restauraci","objednat"]
 
 #STOPWORDS WITHOUT DIACRITICS LOWERCASE
 prepositions_without = [''.join((c for c in unicodedata.normalize('NFD', preposition) if unicodedata.category(c) != 'Mn')) for preposition in prepositions]
@@ -59,7 +61,7 @@ pronouns_upper_without = [pronoun.upper() for pronoun in pronouns_without]
 verbs_upper_without = [verb.upper() for verb in verbs_without]
 
 # ALL STOPWORDS
-stopwords_cz = prepositions + conjunctions + pronouns + verbs + prepositions_without + pronouns_without + conjunctions_without + verbs_without + prepositions_upper + conjuctions_upper + pronouns_upper + verbs_upper + prepositions_upper_without + conjuctions_upper_without + pronouns_upper_without + verbs_upper_without + another_specific
+stopwords_cz = prepositions + conjunctions + pronouns + verbs + prepositions_without + pronouns_without + conjunctions_without + verbs_without + prepositions_upper + conjuctions_upper + pronouns_upper + verbs_upper + prepositions_upper_without + conjuctions_upper_without + pronouns_upper_without + verbs_upper_without + another_specific + text_specific_stopwords
 """
 #WORDCLOUD
 def wordcloud_color(word=None, font_size=None, position=None, orientation=None, font_path=None, random_state=None):
@@ -79,16 +81,42 @@ def wordcloud_to_file(list_of_text,file):
     # plt.axis("off")
     # plt.show()
     wordcloud.to_file("img\\" + file)
+"""
+#LEMMATIZOVANÉ REVIEWS
+path_to_lemmata_xlsx = sys.argv[1]
+workbook = xlrd.open_workbook(path_to_lemmata_xlsx, 'rb')
+# Andy -> C:\\DA\\ProjectDA\\Excel\\lemmata_reviews.xlsx
 
-#až budou lemma. tak zmenit listy
+sheet = workbook.sheet_by_index(0)
+rows = []
+for i in range(sheet.nrows):
+    columns = []
+    for j in range(sheet.ncols):
+        columns.append(sheet.cell(i, j).value)
+    rows.append(columns)
+
+lemma_reviews_all = []
+lemma_neutral_reviews = []
+lemma_positive_reviews = []
+lemma_negative_reviews = []
+for i in rows[1:]:
+    lemma_reviews_all.append(i[1])
+    if i[2] == 1:
+        lemma_positive_reviews.append(i[1])
+    elif i[2] == 0:
+        lemma_neutral_reviews.append(i[1])
+    elif i[2] == -1:
+        lemma_negative_reviews.append(i[1])
+"""
 color = 60
-wordcloud_to_file(reviews_all,"all_reviews.png")
-
+#wordcloud_to_file(reviews_all,"all_reviews.png")
+wordcloud_to_file(lemma_reviews_all,"lemma_all_reviews.png")
 color = 140
-wordcloud_to_file(positive_reviews,"positive_reviews.png")
-
+#wordcloud_to_file(positive_reviews,"positive_reviews.png")
+wordcloud_to_file(lemma_positive_reviews,"lemma_positive_reviews.png")
 color = 21
-wordcloud_to_file(negative_reviews,"negative_reviews.png")
+#wordcloud_to_file(negative_reviews,"negative_reviews.png")
+wordcloud_to_file(lemma_negative_reviews,"lemma_negative_reviews.png")
 """
 
 #KNIHOVNA NLTK
@@ -141,11 +169,11 @@ def get_frequent_words(list_of_words, file):
     fdist = FreqDist()
     for word in word_tokenize(clean_reviews):
         fdist[word.lower()] += 1
-    words = fdist.most_common(15)
+    words = fdist.most_common(30)
 
     df = pd.DataFrame(words ,columns=["word","count"])
     export_csv = df.to_csv ("C:\\DA\\ProjectDA\\csv\\" + file, index = None, header=True)
 
-get_frequent_words(reviews_all, "frequent_words_all.csv")
-get_frequent_words(positive_reviews, "frequent_words_positive.csv")
-get_frequent_words(negative_reviews, "frequent_words_negative.csv")
+get_frequent_words(lemma_reviews_all, "frequent_words_all.csv")
+get_frequent_words(lemma_positive_reviews, "frequent_words_positive.csv")
+get_frequent_words(lemma_negative_reviews, "frequent_words_negative.csv")
