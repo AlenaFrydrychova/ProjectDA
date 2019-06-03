@@ -125,7 +125,6 @@ from nltk.tokenize import word_tokenize
 from nltk.text import Text
 from nltk.probability import FreqDist
 from nltk.stem import WordNetLemmatizer
-import sys
 """
 def get_concordance(list_of_reviews,concordance_word,count_of_lines,file):
     string_reviews = "\n".join(list_of_reviews)
@@ -169,7 +168,7 @@ def get_frequent_words(list_of_words, file):
     fdist = FreqDist()
     for word in word_tokenize(clean_reviews):
         fdist[word.lower()] += 1
-    words = fdist.most_common(30)
+    words = fdist.most_common(100)
 
     df = pd.DataFrame(words ,columns=["word","count"])
     export_csv = df.to_csv ("C:\\DA\\ProjectDA\\csv\\" + file, index = None, header=True)
