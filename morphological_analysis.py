@@ -86,8 +86,8 @@ for review in reviews_all:
         id += 1
 
 #request na API na FI MU
-i = 5400 #musí se rovnat začátku rozsahu ve for cyklu níže (nelekat se, nebude se to rovnat tomu jaké id je v souboru lemmata.csv naposledy)
-for text in all_reviews_after_splitting[5400:5900]:
+i = 6400 #musí se rovnat začátku rozsahu ve for cyklu níže (nelekat se, nebude se to rovnat tomu jaké id je v souboru lemmata.csv naposledy)
+for text in all_reviews_after_splitting[6400:]:
     url = "https://nlp.fi.muni.cz/languageservices/"
     morphological_analysis = "service.py?call=tagger&lang=cs&output=json&text="
     res = requests.get(url + morphological_analysis + text, timeout=5)
@@ -114,6 +114,7 @@ for text in all_reviews_after_splitting[5400:5900]:
         break
     i += 1
     time.sleep(1)
+
 """
 #POLITENESS (asi nemá smysl, četla jsem recenze, a asi tak dvě by mohly být "rude", některé navíc mají více než tisíc znaků, takže nejdou poslat)
 i = 0 #neodpovídá skutečnosti, protože bere jen z negativních recenzí
