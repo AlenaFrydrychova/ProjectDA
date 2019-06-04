@@ -11,7 +11,7 @@ import sys
 path_to_sentiment_xlsx = sys.argv[1]
 workbook = xlrd.open_workbook(path_to_sentiment_xlsx, 'rb')
 #'C:\\Users\\Alena\\Documents\\DA Czechitas\\projekt\\ProjectDA\\Excel\\sentiment.xlsx', 'rb')#
-# C:\\DA\\ProjectDA\\Excel\\sentiment.xlsx
+# C:\DA\ProjectDA\Excel\sentiment.xlsx
 sheet = workbook.sheet_by_index(0)
 rows = []
 for i in range(sheet.nrows):
@@ -62,7 +62,7 @@ verbs_upper_without = [verb.upper() for verb in verbs_without]
 
 # ALL STOPWORDS
 stopwords_cz = prepositions + conjunctions + pronouns + verbs + prepositions_without + pronouns_without + conjunctions_without + verbs_without + prepositions_upper + conjuctions_upper + pronouns_upper + verbs_upper + prepositions_upper_without + conjuctions_upper_without + pronouns_upper_without + verbs_upper_without + another_specific + text_specific_stopwords
-"""
+
 #WORDCLOUD
 def wordcloud_color(word=None, font_size=None, position=None, orientation=None, font_path=None, random_state=None):
     h = color
@@ -81,7 +81,7 @@ def wordcloud_to_file(list_of_text,file):
     # plt.axis("off")
     # plt.show()
     wordcloud.to_file("img\\" + file)
-"""
+
 #LEMMATIZOVANÉ REVIEWS
 path_to_lemmata_xlsx = sys.argv[1]
 workbook = xlrd.open_workbook(path_to_lemmata_xlsx, 'rb')
@@ -107,7 +107,7 @@ for i in rows[1:]:
         lemma_neutral_reviews.append(i[1])
     elif i[2] == -1:
         lemma_negative_reviews.append(i[1])
-"""
+
 color = 60
 #wordcloud_to_file(reviews_all,"all_reviews.png")
 wordcloud_to_file(lemma_reviews_all,"lemma_all_reviews.png")
@@ -117,7 +117,7 @@ wordcloud_to_file(lemma_positive_reviews,"lemma_positive_reviews.png")
 color = 21
 #wordcloud_to_file(negative_reviews,"negative_reviews.png")
 wordcloud_to_file(lemma_negative_reviews,"lemma_negative_reviews.png")
-"""
+
 
 #KNIHOVNA NLTK
 import nltk
@@ -158,7 +158,7 @@ get_concordance(reviews_all,"jídlo",2000,"jídlo_concordance_all.txt")
 richness = (len(set(textList)) / len(textList))*100
 print(round(richness,2), "%")
 """
-
+"""
 #FREKVENCE SLOV (potřeba lemmatizovat alespoň některá a zapsat je do nějaké tabulky, ideální by bylo udělat zvlášť frekvenci slov pro pozitivní a negativní recenze, stejně tak wordcloud, který je momentálně ze všech recenzí)
 def get_frequent_words(list_of_words, file):
     string_reviews = "\n".join(list_of_words)
@@ -176,3 +176,4 @@ def get_frequent_words(list_of_words, file):
 get_frequent_words(lemma_reviews_all, "frequent_words_all.csv")
 get_frequent_words(lemma_positive_reviews, "frequent_words_positive.csv")
 get_frequent_words(lemma_negative_reviews, "frequent_words_negative.csv")
+"""
