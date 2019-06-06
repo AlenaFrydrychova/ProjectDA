@@ -39,7 +39,7 @@ prepositions = ["od","ke","z","s","do","bez","krom","kromě","podle","okolo","ve
 conjunctions = ["a", "i", "ani", "nebo", "či", "přímo", "nadto", "ani", "jak", "tak", "hned", "jednak", "zčásti", "dílem", "ale", "avšak", "však", "leč", "nýbrž", "naopak", "jenomže", "jenže", "sice", "jistě", "ale", "i", "ba", "ba i", "ba ani", "nadto", "dokonce", "nejen", "nebo", "anebo", "buď", "totiž", "vždyť", "neboť", "vždyť", "totiž", "však", "také", "proto", "a proto", "a tak", "tudíž", "a tudíž", "tedy"]
 pronouns = ["já", "ty", "on", "ona", "ono", "my", "vy", "oni", "ony", "ona","se", "můj", "tvůj", "jeho", "její", "náš", "váš", "svůj", "ten", "tento", "tenhle", "onen", "takový", "týž", "tentýž", "sám", "kdo", "co", "jaký", "který","čí", "jenž", "nikdo", "nic", "nijaký", "ničí", "žádný", "někdo", "nějaký", "některý", "lecco", "něčí", "něco"]
 verbs = ["být","bejt","jsem","sme","jsi","je","jest","jsme","jste","jsou","budu","budeš","bude","budeme","budete","budou","buď","budiž","buďme","buďmež","buďte","buďtež","byl","byla","bylo","byli","byly","jsa","jsouc","jsouce","byv","byvše","byvši","bych","bychom","nebyla","nebylo","nam","vás","vas","chtěli","chteli","dali","bys","byste","by", "seš", "mám","máš","má","máme","máte","mají","měj","mějme","mějte","měl","měla","mělo","měli","měly","maje","majíc","majíce"]
-another_specific = ["jít","muset","jeden","druhý","moct","opravdu","všechen","mít","moc","dostat","dal","chtít","dát","si","cca","dne","jen","mi","mě","tady","tomu","že","to","nám","ná","takže","jako","už","pokud","asi","celkem","docela","tam","ze","ve","ji","ta","pak","taky","což","tím","již","možná","která","toho","protože","sem","kde","která","které","tu","než","když","Kč","při","až","ho","této","mne","aby","tuto","tom","No","kdy","jejich","jinak","zde","kterou","toto","ní","nás","mu","dostali","objednali","jím","myslím","jim","Já","Jen","námi","mě","me","Na","Po","není",")","(",".",",",":","!","...","-","?"]
+another_specific = ["jít","přes","muset","jeden","druhý","moct","opravdu","všechen","mít","moc","dostat","dal","chtít","dát","si","cca","dne","jen","mi","mě","tady","tomu","že","to","nám","ná","takže","jako","už","pokud","asi","celkem","docela","tam","ze","ve","ji","ta","pak","taky","což","tím","již","možná","která","toho","protože","sem","kde","která","které","tu","než","když","Kč","při","až","ho","této","mne","aby","tuto","tom","No","kdy","jejich","jinak","zde","kterou","toto","ní","nás","mu","dostali","objednali","jím","myslím","jim","Já","Jen","námi","mě","me","Na","Po","není",")","(",".",",",":","!","...","-","?"]
 text_specific_stopwords = ["jídlo","jídla","jidlo","jidla","jídel","jídlu","obsluha","obsluhy","obsluhu","restaurace","restauraci","objednat"]
 
 #STOPWORDS WITHOUT DIACRITICS LOWERCASE
@@ -75,13 +75,13 @@ def wordcloud_to_file(list_of_text,file):
     reviews_dict = {"review" : list_of_text}
     df = pd.DataFrame(reviews_dict)
     text = " ".join(review for review in df.review) #recenze
-    wordcloud = WordCloud(width=800, height=400,color_func=wordcloud_color, stopwords=stopwords_cz, max_words=120, background_color="white").generate(text)
+    wordcloud = WordCloud(width=800, height=400,color_func=wordcloud_color, stopwords=stopwords_cz, max_words=50, background_color="white").generate(text)
     wordcloud.to_file("img\\" + file)
 
 #LEMMATIZOVANÉ REVIEWS
 path_to_lemmata_xlsx = sys.argv[1]
 workbook = xlrd.open_workbook(path_to_lemmata_xlsx, 'rb')
-# Andy -> C:\\DA\\ProjectDA\\Excel\\lemmata_reviews.xlsx
+# Andy -> C:\DA\ProjectDA\Excel\lemmata_reviews.xlsx
 
 sheet = workbook.sheet_by_index(0)
 rows = []
@@ -106,13 +106,15 @@ for i in rows[1:]:
 
 color = 60
 #wordcloud_to_file(reviews_all,"all_reviews.png")
-wordcloud_to_file(lemma_reviews_all,"lemma_all_reviews.png")
+#wordcloud_to_file(lemma_reviews_all,"lemma_all_reviews.png")
 color = 140
 #wordcloud_to_file(positive_reviews,"positive_reviews.png")
-wordcloud_to_file(lemma_positive_reviews,"lemma_positive_reviews.png")
+#wordcloud_to_file(lemma_positive_reviews,"lemma_positive_reviews.png")
+wordcloud_to_file(lemma_positive_reviews,"wordcloud_positive_presentation.png")
 color = 21
 #wordcloud_to_file(negative_reviews,"negative_reviews.png")
-wordcloud_to_file(lemma_negative_reviews,"lemma_negative_reviews.png")
+#wordcloud_to_file(lemma_negative_reviews,"lemma_negative_reviews.png")
+wordcloud_to_file(lemma_negative_reviews,"wordcloud_negative_presentation.png")
 
 
 #KNIHOVNA NLTK
