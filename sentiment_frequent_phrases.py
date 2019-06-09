@@ -111,7 +111,6 @@ verbs_upper_without = [verb.upper() for verb in verbs_without]
 
 stopwords_cz = verbs + verbs_without + verbs_upper + verbs_upper_without + another_specific + others + others_without + others_upper + others_upper_without + prepositions + conjunctions + pronouns + prepositions_without + pronouns_without + conjunctions_without + prepositions_upper + conjuctions_upper + pronouns_upper + prepositions_upper_without + conjuctions_upper_without + pronouns_upper_without
 
-
 extract_re = re.compile(r'^.*\.+.*$')
 for extract in extracts_prev:
     for i in extract:
@@ -127,12 +126,11 @@ for extract in extracts_next:
         elif i.endswith('.') or i == extract_re.match(i) or i in stopwords_cz:
             extract.remove(i)
 
-
 #SKAREDY KOD PRO ROZDELENI UTRZKU PODLE TEMAT A ZJISTENI NEJCASTEJSICH SLOV
 
-def words_to_dict(keyword,list_name,dict_name):
+def words_to_dict(keyword,list_name,dict_name,prev_or_next):
 
-    for extract in extracts_prev:
+    for extract in prev_or_next:
         if key_word in extract:
             list_name.append(extract)
 
@@ -174,6 +172,6 @@ for key_word in key_words:
     dict_prev = {}
     list_next = []
     dict_next = {}
-    words_to_dict(key_word,list_prev,dict_prev)
-    words_to_dict(key_word,list_next,dict_next)
+    words_to_dict(key_word,list_prev,dict_prev,extracts_prev)
+    words_to_dict(key_word,list_next,dict_next,extracts_next)
     to_csv(key_word,dict_prev,dict_next)
