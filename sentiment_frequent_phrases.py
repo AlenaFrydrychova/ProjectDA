@@ -146,7 +146,7 @@ def words_to_dict(keyword,list_name,dict_name,prev_or_next):
                 dict_name[word] = 1
 
     dict_name = sorted(dict_name.items(), key=lambda kv: kv[1], reverse=True)
-    print(dict_name)
+    return dict_name
 
 
 def to_csv(keyword,dictionary_prev,dictionary_next):
@@ -172,6 +172,6 @@ for key_word in key_words:
     dict_prev = {}
     list_next = []
     dict_next = {}
-    words_to_dict(key_word,list_prev,dict_prev,extracts_prev)
-    words_to_dict(key_word,list_next,dict_next,extracts_next)
+    dict_prev = words_to_dict(key_word,list_prev,dict_prev,extracts_prev)
+    dict_next = words_to_dict(key_word,list_next,dict_next,extracts_next)
     to_csv(key_word,dict_prev,dict_next)
