@@ -72,8 +72,6 @@ extracts_prev = []
 extracts_next = []
 key_words = ['jídlo', 'obsluha', 'restaurace']
 
-
-
 for key_word in key_words:
     try:
         get_extracts(reviews, key_word)
@@ -126,8 +124,7 @@ for extract in extracts_next:
         elif i.endswith('.') or i == extract_re.match(i) or i in stopwords_cz:
             extract.remove(i)
 
-#SKAREDY KOD PRO ROZDELENI UTRZKU PODLE TEMAT A ZJISTENI NEJCASTEJSICH SLOV
-
+#KOD PRO ROZDELENI UTRZKU PODLE TEMAT A ZJISTENI NEJCASTEJSICH SLOV
 def words_to_dict(keyword,list_name,dict_name,prev_or_next):
 
     for extract in prev_or_next:
@@ -148,7 +145,6 @@ def words_to_dict(keyword,list_name,dict_name,prev_or_next):
     dict_name = sorted(dict_name.items(), key=lambda kv: kv[1], reverse=True)
     return dict_name
 
-
 def to_csv(keyword,dictionary_prev,dictionary_next):
     to_file = ''
     next_dict = ''
@@ -164,8 +160,6 @@ def to_csv(keyword,dictionary_prev,dictionary_next):
                 n += 1
             except IndexError:
                 pass
-
-
 
 for key_word in key_words:
     list_prev = []

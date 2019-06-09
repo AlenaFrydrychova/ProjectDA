@@ -9,7 +9,7 @@ import sys
 path_to_sentiment_xlsx = sys.argv[1]
 #do příkazové řádky je třeba napsat příkaz ve formě -> nazev souboru cesta
 #Andy -> morphological_analysis.py C:\DA\ProjectDA\Excel\sentiment.xlsx
-#ALena -> morphological_analysis.py C:\\Users\\Alena\\Documents\\DA_Czechitas\\projekt\\ProjectDA\\Excel\\sentiment.xlsx
+#ALena -> morphological_analysis.py C:\Users\Alena\Documents\DA_Czechitas\projekt\ProjectDA\Excel\sentiment.xlsx
 
 #OTEVIRANI SOUBORU POMOCI KNIHOVNY XLRD, ROZDELENI OBSAHU PODLE RADKU
 workbook = xlrd.open_workbook(path_to_sentiment_xlsx, 'rb')
@@ -51,7 +51,6 @@ verbs_upper_without = [verb.upper() for verb in verbs_without]
 stopwords_cz = prepositions + conjunctions + pronouns + verbs + prepositions_without + pronouns_without + conjunctions_without + verbs_without + prepositions_upper + conjuctions_upper + pronouns_upper + verbs_upper + prepositions_upper_without + conjuctions_upper_without + pronouns_upper_without + verbs_upper_without + another_specific
 
 # VYTAHNE Z RADKU 2. HODNOTU - REVIEW A ROZDELÍ PODLE SENTIMENTU DO SEZNAMŮ
-
 reviews_all = []
 sentiment_all = []
 positive_reviews = []
@@ -69,6 +68,7 @@ for i in rows[1:]:
         negative_reviews.append(i[1])
         review_id_negative.append(i[0])
 
+"""
 #split reviews that are logner than 1000characters
 all_reviews_after_splitting = []
 reviews_all_id = []
@@ -115,8 +115,7 @@ for text in all_reviews_after_splitting[0:500]:
         break
     i += 1
     time.sleep(1)
-
-
+"""
 #POLITENESS
 i = 0
 for text in negative_reviews[0:]:
