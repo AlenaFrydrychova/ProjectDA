@@ -75,7 +75,7 @@ def wordcloud_to_file(list_of_text,file):
     reviews_dict = {"review" : list_of_text}
     df = pd.DataFrame(reviews_dict)
     text = " ".join(review for review in df.review) #recenze
-    wordcloud = WordCloud(width=800, height=400,color_func=wordcloud_color, stopwords=stopwords_cz, max_words=50, background_color="white").generate(text)
+    wordcloud = WordCloud(width=600, height=800,color_func=wordcloud_color, stopwords=stopwords_cz, max_words=50, background_color="white").generate(text)
     wordcloud.to_file("img\\" + file)
 
 #LEMMATIZOVANÉ REVIEWS
