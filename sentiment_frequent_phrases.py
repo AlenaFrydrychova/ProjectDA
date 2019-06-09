@@ -19,8 +19,8 @@ def get_sentiment(chunk):
 
 path_to_sentiment_xlsx = sys.argv[1]
 #do příkazové řádky je třeba napsat příkaz ve formě -> nazev souboru + cesta
-#Andy -> sentiment_frequent_phrases.py C:\\DA\\ProjectDA\\Excel\\sentiment.xlsx
-#Alena -> sentiment_frequent_phrases.py C:\\Users\\Alena\\Documents\\DA_Czechitas\\projekt\\ProjectDA\\Excel\\sentiment.xlsx
+#Andy -> sentiment_frequent_phrases.py C:\DA\ProjectDA\Excel\sentiment.xlsx
+#Alena -> sentiment_frequent_phrases.py C:\Users\Alena\Documents\DA_Czechitas\projekt\ProjectDA\Excel\sentiment.xlsx
 
 #OTEVIRANI SOUBORU POMOCI KNIHOVNY XLRD, ROZDELENI OBSAHU PODLE RADKU
 workbook = xlrd.open_workbook(path_to_sentiment_xlsx, 'rb')
@@ -50,8 +50,6 @@ for recenze in reviews:
 used_chars = []
 for element in reviews:
     used_chars.append(len(element))
-
-
 
 with open('reviews_analysis.csv', 'w', encoding='utf-8') as csvfile:
     writer = csv.writer(csvfile)
@@ -132,10 +130,8 @@ for extract in extracts_next:
 
 #SKAREDY KOD PRO ROZDELENI UTRZKU PODLE TEMAT A ZJISTENI NEJCASTEJSICH SLOV
 
-
-
 def words_to_dict(keyword,list_name,dict_name):
-   
+
     for extract in extracts_prev:
         if key_word in extract:
             list_name.append(extract)
