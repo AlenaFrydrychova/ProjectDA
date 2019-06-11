@@ -34,8 +34,17 @@ for i in range(sheet.nrows):
 
 # VYTAHNE Z RADKU 3. HODNOTU - REVIEW
 reviews = []
+positive_reviews = []
+negative_reviews = []
+neutral_reviews = []
 for i in rows[1:]:
     reviews.append(i[1])
+    if i[2] == 1:
+        positive_reviews.append(i[1])
+    elif i[2] == 0:
+        neutral_reviews.append(i[1])
+    elif i[2] == -1:
+        negative_reviews.append(i[1])
 
 '''
 #POUZIJE FUNKCI ANALYZUJ_RECENZI A HODNOTY ULOZI DO LISTU
@@ -56,25 +65,38 @@ with open('reviews_analysis.csv', 'w', encoding='utf-8') as csvfile:
     writer.writerows(zip(reviews, hodnoty_tofile, used_chars))
 '''
 #NAJDE 2 SLOVA PRED A ZA KLICOVYMI
-def get_extracts(reviews, key_word):
+
+#POZITIVNÍ RECENZE
+
+#NEGATIVNÍ RECENZE
+
+#VŠECHNY RECENZE
+def get_extracts(list_reviews, key_word,output_list_1, output_list_2):
+    reviews_string = ''.join(list_reviews)
+    reviews_string = reviews_string.lower()
+    reviews_by_word = reviews_string.split()
     position = reviews_by_word.index(key_word)
     while position > 0:
         position = reviews_by_word.index(key_word, position+2)
-        extracts_prev.append(reviews_by_word[position-2:position+1])
-        extracts_next.append(reviews_by_word[position:position+2])
-    return extracts_prev
-    return extracts_next
+        output_list_1.append(reviews_by_word[position-2:position+1])
+        output_list_2.append(reviews_by_word[position:position+2])
+    return output_list_1
+    return output_list_2
 
-reviews_string = ''.join(reviews)
-reviews_string = reviews_string.lower()
-reviews_by_word = reviews_string.split()
-extracts_prev = []
-extracts_next = []
+extracts_prev_positive = []
+extracts_next_positive = []
+extracts_prev_negative = []
+extracts_next_negative = []
 key_words = ['jídlo', 'obsluha', 'restaurace']
 
+#V jednom Try to nefunguje, jen pokud má get_extract každý vlastní try
 for key_word in key_words:
     try:
-        get_extracts(reviews, key_word)
+        get_extracts(positive_reviews, key_word,extracts_prev_positive,extracts_next_positive)
+    except ValueError:
+        pass
+    try:
+        get_extracts(negative_reviews, key_word,extracts_prev_negative,extracts_next_negative)
     except ValueError:
         pass
 
@@ -109,24 +131,23 @@ verbs_upper_without = [verb.upper() for verb in verbs_without]
 
 stopwords_cz = verbs + verbs_without + verbs_upper + verbs_upper_without + another_specific + others + others_without + others_upper + others_upper_without + prepositions + conjunctions + pronouns + prepositions_without + pronouns_without + conjunctions_without + prepositions_upper + conjuctions_upper + pronouns_upper + prepositions_upper_without + conjuctions_upper_without + pronouns_upper_without
 
-extract_re = re.compile(r'^.*\.+.*$')
-for extract in extracts_prev:
-    for i in extract:
-        if len(i) < 4:
-            extract.remove(i)
-        elif i.endswith('.') or extract_re.match(i) or i in stopwords_cz:
-            extract.remove(i)
+#ODSTRANĚNÍ ZNAKŮ, KTERÉ V UTRŽCÍCH NECHCEME
+def extracts_clean(input_list):
+    extract_re = re.compile(r'^.*\.+.*$')
+    for extract in input_list:
+        for i in extract:
+            if len(i) < 4:
+                extract.remove(i)
+            elif i.endswith('.') or extract_re.match(i) or i in stopwords_cz:
+                extract.remove(i)
 
-for extract in extracts_next:
-    for i in extract:
-        if len(i) < 4:
-            extract.remove(i)
-        elif i.endswith('.') or i == extract_re.match(i) or i in stopwords_cz:
-            extract.remove(i)
+extracts_clean(extracts_next_positive)
+extracts_clean(extracts_prev_positive)
+extracts_clean(extracts_next_negative)
+extracts_clean(extracts_prev_negative)
 
 #KOD PRO ROZDELENI UTRZKU PODLE TEMAT A ZJISTENI NEJCASTEJSICH SLOV
 def words_to_dict(keyword,list_name,dict_name,prev_or_next):
-
     for extract in prev_or_next:
         if key_word in extract:
             list_name.append(extract)
@@ -145,27 +166,34 @@ def words_to_dict(keyword,list_name,dict_name,prev_or_next):
     dict_name = sorted(dict_name.items(), key=lambda kv: kv[1], reverse=True)
     return dict_name
 
-def to_csv(keyword,dictionary_prev,dictionary_next):
+def to_csv(keyword,dict_prev,dict_next,sentiment):
     to_file = ''
     next_dict = ''
     n = 0
-    with open("frequent_words.csv","a",encoding="utf-8", newline="") as f:
+    with open("csv\frequent_words_sentiment.csv","a",encoding="utf-8", newline="") as f:
         writer = csv.writer(f)
         for i in dict_prev:
             try:
                 i = str(i)
                 next_dict = str(dict_next[n])
-                to_file = (i.replace(',', '#').replace('()', ''), key_word, next_dict.replace('""', '').replace(',', '#').replace('()', ''))
+                to_file = (sentiment, i.replace(',', '#').replace('()', ''), key_word, next_dict.replace('""', '').replace(',', '#').replace('()', ''))
                 writer.writerow(to_file)
                 n += 1
             except IndexError:
                 pass
 
 for key_word in key_words:
-    list_prev = []
-    dict_prev = {}
-    list_next = []
-    dict_next = {}
-    dict_prev = words_to_dict(key_word,list_prev,dict_prev,extracts_prev)
-    dict_next = words_to_dict(key_word,list_next,dict_next,extracts_next)
-    to_csv(key_word,dict_prev,dict_next)
+    list_prev_positive = []
+    list_next_positive = []
+    dict_prev_positive = {}
+    dict_next_positive = {}
+    dict_prev_positive = words_to_dict(key_word,list_prev_positive,dict_prev_positive,extracts_prev_positive)
+    dict_next_positive = words_to_dict(key_word,list_next_positive,dict_next_positive,extracts_next_positive)
+    list_prev_negative = []
+    list_next_negative = []
+    dict_prev_negative = {}
+    dict_next_negative = {}
+    dict_prev_negative = words_to_dict(key_word,list_prev_negative,dict_prev_negative,extracts_prev_negative)
+    dict_next_negative = words_to_dict(key_word,list_next_negative,dict_next_negative,extracts_next_negative)
+    to_csv(key_word,dict_prev_negative,dict_next_negative,sentiment="-1")
+    to_csv(key_word,dict_prev_positive,dict_next_positive,sentiment="1")
