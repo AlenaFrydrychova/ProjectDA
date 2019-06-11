@@ -170,7 +170,7 @@ def to_csv(keyword,dict_prev,dict_next,sentiment):
     to_file = ''
     next_dict = ''
     n = 0
-    with open("csv\frequent_words_sentiment.csv","a",encoding="utf-8", newline="") as f:
+    with open("csv\\frequent_words_sentiment.csv","a",encoding="utf-8", newline="") as f:
         writer = csv.writer(f)
         for i in dict_prev:
             try:
